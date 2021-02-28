@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "693559882176",
+    "project_id": "yesil-4f2e8",
+    "storage_bucket": "yesil-4f2e8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:693559882176:android:48690c80e9b0586de21825",
+        "android_client_info": {
+          "package_name": "com.example.solution_challenge"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "693559882176-ej7pligkjf6437jk0d9fr3q911ohg31n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.solution_challenge",
+            "certificate_hash": "77b47a98a132518e72d7780243959a63d0c6ac7f"
+          }
+        },
+        {
+          "client_id": "693559882176-uu8ndisu91h4iv7mg9a1p5ksn7sqv687.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1gQZe_zqUg4D9Fmb35oBGBp4O__Y4IL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "693559882176-uu8ndisu91h4iv7mg9a1p5ksn7sqv687.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

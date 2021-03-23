@@ -3,30 +3,49 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:solution_challenge/domain/models/parks.dart';
 import 'package:solution_challenge/domain/repository/remote_source.dart';
 import 'package:solution_challenge/domain/repository/repo.dart';
+import 'package:solution_challenge/features/widgets/appexpansion.dart';
 
 abstract class HomePageProviderAbs{
   onMapCreated(controller);
   getParkList();
+  setRating(String parkname,var uid ,double rating);
   moveCamera();
 }
 
 class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
   GoogleMapController _controller;
-  PageController pageController;
+  PageController _pageController;
+
+  PageController get pageController => _pageController;
+
+
+  GlobalKey<AppExpansionTileState> _expansionTileList=GlobalKey<AppExpansionTileState>();
+
+
+  GlobalKey<AppExpansionTileState> get expansionTileList => _expansionTileList;
+
+
+
+  PageController minscrollExtend;
   List<Marker> _markers=List<Marker>();
-  bool _visibility=false;
 
-  bool get visibility => _visibility;
+  List<String> filter=List<String>();
 
-  set visibility(bool value) {
-    _visibility = value;
-    notifyListeners();
-  }
+
 
   List<Marker> get markers => _markers;
 
 
   List<Parks> _parkList=List<Parks>();
+  List<Parks> _park=List<Parks>();
+
+  List<Parks> get park => _park;
+
+  set park(List<Parks> value) {
+    _park = value;
+    notifyListeners();
+  }
+
   int _parkListPosition=0;
   int _preview;
 
@@ -34,6 +53,32 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
 
 
   bool _isLoading=true;
+  bool _spor=false;
+  bool _cocukPark=false;
+  bool _yemek=false;
+  bool _wc=false;
+  bool _bisiklet=false;
+  bool _kosuPark=false;
+  bool _ethernet=false;
+
+  double _ortRating;
+  double userRating=1;
+
+  double get ortRating => _ortRating;
+
+  set ortRating(double value) {
+    _ortRating = value;
+    notifyListeners();
+  }
+
+  bool get spor => _spor;
+
+  set spor(bool value) {
+    _spor = value;
+    notifyListeners();
+  }
+
+
 
 
   ProductRepository _productRepository=   ProductRepository();
@@ -68,7 +113,6 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
 
   set parkListPosition(int value) {
     _parkListPosition = value;
-    notifyListeners();
   }
 
   set preview(int value) {
@@ -82,6 +126,14 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
     notifyListeners();
   }
 
+  set expansionTileList(GlobalKey<AppExpansionTileState> value) {
+    _expansionTileList = value;
+    notifyListeners();
+  }
+
+  set pageController(PageController value) {
+    _pageController = value;
+  }
 
   set isLoading(bool value) {
     _isLoading = value;
@@ -106,8 +158,22 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
     notifyListeners();
   }
 
-  onMapCreated(controller){
-      _controller=controller;
+  onMapCreated(controller)async{
+    BitmapDescriptor  mapMarker=await BitmapDescriptor.fromAssetImage(ImageConfiguration(), "asset/markeragac.png");
+
+    _controller=controller;
+      parkList.forEach((element) async{
+        LatLng coords=LatLng(double.parse(element.coords1),double.parse(element.coords2));
+          print("2132"+element.coords1);
+          markers.add(Marker(
+            icon: mapMarker,
+              markerId: MarkerId(element.title),
+              infoWindow: InfoWindow(title: element.title, snippet: element.description),
+              position:coords));
+
+
+
+      });
       notifyListeners();
   }
 
@@ -121,12 +187,32 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
 
  Future getParkList()async{
     await _productRepository.getParkList().then((value) {
-    parkList=value;
-    print(parkList[0].coords1.toString()+" : "+parkList[0].coords2.toString());
+    park=value;
     isLoading=false;
     });
     notifyListeners();
   }
+
+  Future setRating(String parkname,var uid ,double rating)async{
+    await _productRepository.setRating(parkname, uid, rating);
+  }
+  Future getRating(String parkname)async{
+
+    var d=await _productRepository.getRating(parkname);
+    ortRating=d.isNaN==true?1:d;
+    print(ortRating.toString()+"provider");
+    notifyListeners();
+  }
+
+  Future getUserRating(String parkname,var uid)async{
+   var d= await _productRepository.getUserRating(parkname, uid);
+   userRating =d.isNaN==true?1:d;
+
+   notifyListeners();
+
+
+  }
+
 
   scroll(){
     if(pageController.page.toInt()!=preview){
@@ -137,5 +223,77 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
 
   }
 
+  checkMenuVisibility(){
+    if(opacity>=0.9){
+      return false;
+    }else{
+      return true;
+    }
+  }
 
+  bool get cocukPark => _cocukPark;
+
+  set cocukPark(bool value) {
+    _cocukPark = value;
+    notifyListeners();
+  }
+
+  bool get yemek => _yemek;
+
+  set yemek(bool value) {
+    _yemek = value;
+    notifyListeners();
+  }
+
+  bool get wc => _wc;
+
+  set wc(bool value) {
+    _wc = value;
+    notifyListeners();
+  }
+
+  bool get bisiklet => _bisiklet;
+
+  set bisiklet(bool value) {
+    _bisiklet = value;
+    notifyListeners();
+  }
+
+  bool get kosuPark => _kosuPark;
+
+  set kosuPark(bool value) {
+    _kosuPark = value;
+    notifyListeners();
+  }
+
+  bool get ethernet => _ethernet;
+
+  set ethernet(bool value) {
+    _ethernet = value;
+    notifyListeners();
+  }
+
+  checkFilter(){
+    parkList.clear();
+    ///eğer tüm koşullar true ise
+    if(kosuPark==true){
+
+      if(kosuPark==true){
+        List.generate(park.length, (index) {
+          if(park[index].kosuPark==true){
+            parkList.add(park[index]);
+            notifyListeners();
+          }
+        });
+      }
+
+    }else{
+      List.generate(park.length, (index) {
+          parkList.add(park[index]);
+      });
+    }
+
+
+    notifyListeners();
+  }
 }

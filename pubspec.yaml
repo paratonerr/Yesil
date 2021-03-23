@@ -26,8 +26,19 @@ dependencies:
   google_maps_flutter: ^1.2.0
   provider: ^4.3.3
   cloud_firestore: ^0.16.0+1
-  firebase_core: ^0.7.0
+  firebase_core: 0.7.0
   after_layout: ^1.0.7+2
+  intro_slider: ^2.3.4
+  google_sign_in: 4.5.9
+  firebase_auth: 0.20.1
+  filter_list: ^0.0.6
+  redux: ^3.0.0
+  flutter_redux: ^0.5.2
+  getwidget: ^1.1.0
+
+
+
+
 
 
 

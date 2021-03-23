@@ -1,8 +1,15 @@
+import 'dart:ui';
+
 import 'package:after_layout/after_layout.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:solution_challenge/domain/models/parks.dart';
+import 'package:solution_challenge/domain/repository/remote_source.dart';
 import 'package:solution_challenge/features/provider/HomePage_provider.dart';
+import 'package:filter_list/filter_list.dart';
+import 'package:solution_challenge/features/widgets/appexpansion.dart';
 
 class HomePageWidget extends StatefulWidget {
   final HomePageProvider homePageProvider;
@@ -12,37 +19,47 @@ class HomePageWidget extends StatefulWidget {
   @override
   _HomePageWidgetState createState() => _HomePageWidgetState();
 }
-
+class parkList {
+  final String name;
+  final String avatar;
+  parkList({this.name, this.avatar});
+}
 class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
   HomePageProvider _homePageProvider;
-BitmapDescriptor icon;
-String path= "asset/YesilMarker.png";
-  int i=0;
+  BitmapDescriptor mapMarker;
+FirebaseAuth _auth =FirebaseAuth.instance;
 
+  User user;
 
   @override
   void initState() {
-
-
     // TODO: implement initState
+    user= _auth.currentUser;
+
+
 
     ///initail variable
      _homePageProvider=widget.homePageProvider;
 
-      _homePageProvider.parkList.forEach((element) async{
-       print("2132"+element.coords1);
-       _homePageProvider.markers.add(Marker(
-           markerId: MarkerId(element.title),
-           infoWindow: InfoWindow(title: element.title, snippet: element.description),
-           position: LatLng(double.parse(element.coords1),double.parse(element.coords2))));
-     });
     _homePageProvider.pageController = PageController(initialPage: 1, viewportFraction: 0.8)..addListener(_homePageProvider.scroll);
+
+    _homePageProvider.filter.add("Spor Alanları");
+    _homePageProvider.filter.add("Çocuk Parkı");
+    _homePageProvider.filter.add("Yeme İçme");
+    _homePageProvider.filter.add("Tuvalet");
+    _homePageProvider.filter.add("Bisiklet Yolu");
+    _homePageProvider.filter.add("Koşu Parkı");
+    _homePageProvider.filter.add(" WI-FI");
+
+    _homePageProvider.checkFilter();
+
 
 
 
     super.initState();
 
   }
+
 
 
   @override
@@ -60,113 +77,178 @@ String path= "asset/YesilMarker.png";
                 child: GoogleMap(
                   mapToolbarEnabled: false,
                   zoomControlsEnabled: false,
-                  onMapCreated: _homePageProvider.onMapCreated,
                   markers: Set.from(_homePageProvider.markers),
+                  onMapCreated: _homePageProvider.onMapCreated,
                   initialCameraPosition: CameraPosition(target: LatLng(41.060701, 29.037435 )),
                 ),
               ),
-              DraggableScrollableSheet(
-                initialChildSize: 0.250,
-                minChildSize: 0.250,
-                maxChildSize: 0.9,
-                builder: (context,scrollCntrl){
-                  return SingleChildScrollView(
-                      controller: scrollCntrl,
-                      child: AnimatedOpacity(
-                        duration: Duration(milliseconds: 500),
-                        opacity: _homePageProvider.opacity,
-                        child:   Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30),
-                              )
+              NotificationListener<DraggableScrollableNotification>(
+                onNotification: (value){
+
+                   _homePageProvider.opacity=value.extent+0.1;
+                  return  true;
+                },
+                child: DraggableScrollableSheet(
+                  initialChildSize: 0.40,
+                  minChildSize: 0.4,
+                  maxChildSize: 0.9,
+                  builder: (context,scrollCntrl){
+                    _homePageProvider.getRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title);
+                    _homePageProvider.getUserRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title,user.uid).then((value) {
+
+                     });
+
+
+                    scrollCntrl.addListener(() {
+
+                    });
+                    return SingleChildScrollView(
+                        controller: scrollCntrl,
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(
+                            sigmaX: 2,
+                            sigmaY: 2,
                           ),
-                          height: MediaQuery.of(context).size.height,
-                          child:
-                          Column(
-                            children: [
-                              InkWell(
-                                onTap: (){
-                                  if( _homePageProvider.detailvisiblity==true){
-                                    _homePageProvider.detailvisiblity=false;
-                                    _homePageProvider.opacity=0.6;
-                                  }
-                                  else{
-                                    _homePageProvider.opacity=1;
-                                    _homePageProvider.detailvisiblity=true;
-                                  }
-                                },
-                                child: Column(children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Container(
-                                      height: 3,
-                                      width: 60,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  Text("Ayrıntılar için tıklayın ve yukarı kaydırın",style: TextStyle(color: Colors.grey),),
-                                  Visibility(
-                                    visible:_homePageProvider.detailvisiblity ,
+                          child: AnimatedOpacity(
+                            duration: Duration(milliseconds: 500),
+                            opacity: _homePageProvider.opacity,
+                            child:   Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(30),
+                                    topRight: Radius.circular(30),
+                                  )
+                              ),
+                              height: MediaQuery.of(context).size.height,
+                              child:
+                              Column(
+                                children: [
+                                  InkWell(
+                                    onTap: (){
+                                      if( _homePageProvider.detailvisiblity==true){
+                                        _homePageProvider.detailvisiblity=false;
+                                        _homePageProvider.opacity=0.6;
+                                      }
+                                      else{
+                                        _homePageProvider.opacity=1;
+                                        _homePageProvider.detailvisiblity=true;
+                                      }
+                                    },
                                     child: Column(children: [
-                                      detailInfo( _homePageProvider.parkListPosition-1),
                                       Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Divider(color: Colors.black45,indent: 30,endIndent: 30,),
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Container(
+                                          height: 3,
+                                          width: 60,
+                                          color: Colors.grey,
+                                        ),
                                       ),
-                                      detailCard(title: "Engelli Dostu",icon: Icons.accessible,enabled: true),
-                                      SizedBox(height: 30,),
-                                      detailCard(title: "Spor Alanları",icon: Icons.sports,enabled: true),
-                                      SizedBox(height: 30,),
-                                      detailCard(title: "Çocuk Oyun Alanı",icon: Icons.gamepad_outlined,enabled: false),
-                                      SizedBox(height: 30,),
-                                      detailCard(title: "  Tuvalet",icon: Icons.wash,enabled: true),
+                                      Text("Ayrıntılar için tıklayın ve yukarı kaydırın",style: TextStyle(color: Colors.grey),),
+                                      AnimatedOpacity(
+                                        opacity:_homePageProvider.opacity ,
+                                        duration: Duration(milliseconds: 500),
+                                        child: Visibility(
+                                          visible: !_homePageProvider.checkMenuVisibility(),
+                                          child: Column(children: [
+                                            detailInfo( _homePageProvider.parkListPosition),
+                                            Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Divider(color: Colors.black45,indent: 30,endIndent: 30,),
+                                            ),
+                                            detailCard(title: "Engelli Dostu",icon: Icons.accessible,enabled: true),
+                                            SizedBox(height: 30,),
+                                            detailCard(title: "Spor Alanları",icon: Icons.sports,enabled: true),
+                                            SizedBox(height: 30,),
+                                            detailCard(title: "Çocuk Oyun Alanı",icon: Icons.gamepad_outlined,enabled: false),
+                                          ],),
+                                        ),
+                                      ),
+
 
 
                                     ],),
+
                                   ),
 
+                                ],
+                              ) ,
 
 
-                                ],),
-
-                              ),
-
-                            ],
-                          ) ,
-
-
-                        ),
-                      )
+                            ),
+                          ),
+                        )
 
 
 
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-              Visibility(
-                visible: !_homePageProvider.detailvisiblity,
-                child:  Positioned(
-                    bottom: 20,
+              Positioned(
+                  bottom: 20,
+                  child: AnimatedOpacity(
+                    duration: Duration(milliseconds: 500),
+                    opacity: 1.5-_homePageProvider.opacity,
                     child: Container(
                       height: 150,
                       width: MediaQuery.of(context).size.width,
                       child: PageView.builder(
                         itemCount:_homePageProvider.parkList.length,
                         itemBuilder: (context, position) {
-                          _homePageProvider.parkListPosition=position;
-                          return parkListCard(position);
+                          _homePageProvider.parkListPosition = _homePageProvider.pageController.position.minScrollExtent == null ? _homePageProvider.pageController.initialPage.toInt() : _homePageProvider.pageController.page.toInt();
+
+                          return Visibility(
+                              visible: _homePageProvider.checkMenuVisibility(),
+                              child: parkListCard(position));
                         },
                         controller: _homePageProvider.pageController,
                       ),
-                    )),),
+                    ),
+                  )),
 
-              Visibility(
-                visible: !_homePageProvider.detailvisiblity,
-                child:filterBar(),),
-              Visibility(visible: !_homePageProvider.detailvisiblity,child: zoomButtons()),
+              Positioned(
+                top:34,
+                left: 100,
+                right: 10,
+                child:  InkWell(
+                  onTap: (){
+                       _homePageProvider.expansionTileList.currentState.collapse();
+                     _homePageProvider.checkFilter();
+
+
+
+                  },
+                  child: Container()
+                )
+
+              ),
+
+              Positioned(
+              child: AnimatedOpacity(
+                  duration: Duration(milliseconds: 500),
+                  opacity: 1.5-_homePageProvider.opacity,
+                  child: Visibility(
+                      visible: _homePageProvider.checkMenuVisibility(),
+                      child: InkWell(
+                          onTap: ()async{
+
+
+                            _homePageProvider.expansionTileList.currentState.expand();
+
+
+
+                          },
+                          child: filterBar()))),
+                ),
+
+
+              AnimatedOpacity(
+                duration: Duration(milliseconds: 500),
+                  opacity: 1.5-_homePageProvider.opacity,
+                  child: Visibility(
+                      visible: _homePageProvider.checkMenuVisibility(),
+                      child: zoomButtons())),
             ],),
           ),
         ],
@@ -182,6 +264,9 @@ String path= "asset/YesilMarker.png";
         if (_homePageProvider.pageController.position.haveDimensions) {
           value = _homePageProvider.pageController.page - position;
           value = (1 - (value.abs() * 0.3) + 0.06).clamp(0.0, 1.0);
+
+
+
         }
         return Center(
           child: SizedBox(
@@ -190,10 +275,11 @@ String path= "asset/YesilMarker.png";
             child: widget,
           ),
         );
+
       },
       child: InkWell(
-        onTap: () {
-          _homePageProvider.moveCamera();
+        onTap: () async{
+         await _homePageProvider.moveCamera();
         },
         child: Stack(
           children: [
@@ -222,7 +308,7 @@ String path= "asset/YesilMarker.png";
                               borderRadius: BorderRadius.circular(
                                  20),
                               image: DecorationImage(
-                                  image: AssetImage("asset/$position.jpg"),
+                                  image: AssetImage("asset/YesilMarker.png"),
                                   fit: BoxFit.cover)),
                         ),
                       ),
@@ -255,83 +341,235 @@ String path= "asset/YesilMarker.png";
   }
 
   Widget filterBar(){
-    return Positioned(
-      top: 40,
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.only(left:30.0,right: 10),
+      child: Row(
         children: [
-          InkWell(
-            onTap: (){
-              if(_homePageProvider.visibility==false){
-                _homePageProvider.visibility=true;
-              }else{
-                _homePageProvider.visibility=false;
-              }
-            },
-
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(width: 76,),
-                Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [BoxShadow(color: Colors.black38,offset: Offset(0,3),blurRadius: 8)],
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10)
-                  ),
-                  height: 50,
-                  width: MediaQuery.of(context).size.width-410,
-                  child: Icon(Icons.menu,size: 30,color: Color(0xff545857),),
-                ),
-                SizedBox(width: 10,),
-
-                Container(
-                  decoration: BoxDecoration(
-                      boxShadow: [BoxShadow(color: Colors.black38,offset: Offset(0,3),blurRadius: 8)],
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10)
-                  ),
-                  height: 50,
-                  width: MediaQuery.of(context).size.width-230,
-                  child: Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text("Filtrelemek için dokunun",style: TextStyle(color: Colors.grey),),
-                    ),
-                    Container(height: 35,width: 1,color: Colors.grey.shade400,),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(Icons.filter_list,color: Color(0xff545857),),
-                    )
-                  ],),
-                ),
-
-              ],
+          Container(
+            decoration: BoxDecoration(
+                boxShadow: [BoxShadow(color: Colors.black38,offset: Offset(0,3),blurRadius: 8)],
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10)
             ),
+            height: 50,
+            width: MediaQuery.of(context).size.width-310,
+            child: Icon(Icons.menu,size: 30,color: Color(0xff545857),),
           ),
           InkWell(
-        ///zaman yetmediği için menüyü localden çektik menüyü normalde böyle değil
-            child: Visibility(
-         visible: _homePageProvider.visibility,
-              child: Padding(
+            onTap: (){
+              _homePageProvider.expansionTileList.currentState.collapse();
 
-                padding: const EdgeInsets.only(left:150.0),
-                child: Container(
-                  height: 250,
-                  width: 250,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      fit: BoxFit.fill,
-                      image: AssetImage("asset/filtre.png")
+            },
+            child: Card(
+              elevation: 10,
+              child: Stack(
+                children: [
+                  AppExpansionTile(
+                    key: _homePageProvider.expansionTileList,
+                    backgroundColor: Colors.transparent,
+                    children: [
 
-                    )
+                      Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+
+                              borderRadius: BorderRadius.circular(20)
+                          ),
+                          height: 250,
+                          width: 250,
+                          child:Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top:16.0,left:2),
+                                    child: FilterButton(index: 0,homePageProvider: _homePageProvider,select: _homePageProvider.spor,name1: _homePageProvider.filter[0],),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left:5.0,top:16),
+                                    child: FilterButton(index: 1,select: _homePageProvider.cocukPark,name1: _homePageProvider.filter[1],homePageProvider: _homePageProvider,),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top:16.0,left:2),
+                                    child: FilterButton(index:2,select: _homePageProvider.yemek,name1: _homePageProvider.filter[2],homePageProvider: _homePageProvider,),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left:5.0,top:16),
+                                    child: FilterButton(select: _homePageProvider.wc,name1: _homePageProvider.filter[3],index: 3,homePageProvider: _homePageProvider,),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top:16.0,left:2),
+                                    child: FilterButton(select: _homePageProvider.bisiklet,name1: _homePageProvider.filter[4],index: 4,homePageProvider: _homePageProvider,),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left:5.0,top:16),
+                                    child: FilterButton(select: _homePageProvider.kosuPark,name1: _homePageProvider.filter[5],index: 5,homePageProvider: _homePageProvider,),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top:16.0,left:2),
+                                    child: FilterButton(select: _homePageProvider.ethernet,name1: _homePageProvider.filter[6],index: 6,homePageProvider: _homePageProvider,),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                      )
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text("Filtrelemek için dokunun",style: TextStyle(color: Colors.grey),),
+                      ),
+                      Container(height: 35,width: 1,color: Colors.grey.shade400,),
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Icon(Icons.filter_list,color: Color(0xff545857),),
+                      ),],
                   ),
 
-                ),
+                ],
               ),
             ),
-          )
+          ),
         ],
       ),
+    );
+
+
+
+
+
+
+      Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top:8.0),
+          child: Container(
+            decoration: BoxDecoration(
+                boxShadow: [BoxShadow(color: Colors.black38,offset: Offset(0,3),blurRadius: 8)],
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10)
+            ),
+            height: 50,
+            width: MediaQuery.of(context).size.width-310,
+            child: Icon(Icons.menu,size: 30,color: Color(0xff545857),),
+          ),
+        ),
+
+        Card(
+          elevation: 10,
+          child: Stack(
+            children: [
+              Row(
+                children: [
+                  InkWell(
+                    onTap:(){
+                      _homePageProvider.expansionTileList.currentState.collapse();
+
+
+                    },
+                    child: AppExpansionTile(
+                      key: _homePageProvider.expansionTileList,
+                      backgroundColor: Colors.transparent,
+                      children: [
+
+                        Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+
+                                borderRadius: BorderRadius.circular(20)
+                            ),
+                            height: 250,
+                            width: 250,
+                            child:Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(top:16.0,left:2),
+                                      child: FilterButton(index: 0,homePageProvider: _homePageProvider,select: _homePageProvider.spor,name1: _homePageProvider.filter[0],),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left:5.0,top:16),
+                                      child: FilterButton(index: 1,select: _homePageProvider.cocukPark,name1: _homePageProvider.filter[1],homePageProvider: _homePageProvider,),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(top:16.0,left:2),
+                                      child: FilterButton(index:2,select: _homePageProvider.yemek,name1: _homePageProvider.filter[2],homePageProvider: _homePageProvider,),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left:5.0,top:16),
+                                      child: FilterButton(select: _homePageProvider.wc,name1: _homePageProvider.filter[3],index: 3,homePageProvider: _homePageProvider,),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(top:16.0,left:2),
+                                      child: FilterButton(select: _homePageProvider.bisiklet,name1: _homePageProvider.filter[4],index: 4,homePageProvider: _homePageProvider,),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left:5.0,top:16),
+                                      child: FilterButton(select: _homePageProvider.kosuPark,name1: _homePageProvider.filter[5],index: 5,homePageProvider: _homePageProvider,),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(top:16.0,left:2),
+                                      child: FilterButton(select: _homePageProvider.ethernet,name1: _homePageProvider.filter[6],index: 6,homePageProvider: _homePageProvider,),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                        )
+                      ],
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text("Filtrelemek için dokunun",style: TextStyle(color: Colors.grey),),
+                      ),
+                      Container(height: 35,width: 1,color: Colors.grey.shade400,),
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Icon(Icons.filter_list,color: Color(0xff545857),),
+                      ),],
+                  ),
+                ],
+              )
+
+
+
+
+            ],
+          ),
+        )
+
+      ],
     );
 
   }
@@ -349,9 +587,9 @@ String path= "asset/YesilMarker.png";
             InkWell(
               onTap:()async{
                 double screenWidth = MediaQuery.of(context).size.width *
-                    MediaQuery.of(context).devicePixelRatio;
+                    MediaQuery.of(context).size.width;
                 double screenHeight = MediaQuery.of(context).size.height *
-                    MediaQuery.of(context).devicePixelRatio;
+                    MediaQuery.of(context).size.height;
 
                 double middleX = screenWidth / 2;
                 double middleY = screenHeight / 2;
@@ -429,7 +667,7 @@ String path= "asset/YesilMarker.png";
             child: Container(
               decoration: BoxDecoration(
                   image: DecorationImage(
-                      image:AssetImage("asset/$posinited.jpg"),
+                      image:AssetImage("asset/YesilMarker.png"),
                       fit: BoxFit.cover
                   ),
                   borderRadius: BorderRadius.only(
@@ -446,23 +684,40 @@ String path= "asset/YesilMarker.png";
         Expanded(
           child: Column(
             children: [
-              Text(_homePageProvider.parkList[_homePageProvider.parkListPosition-1].title,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w800),),
+              Text(_homePageProvider.parkList[_homePageProvider.parkListPosition].title,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w800),),
               Padding(
-                padding: const EdgeInsets.only(left:40.0),
-                child: Row(children: [
-                  Icon(Icons.star,color: Colors.amber,),
-                  Icon(Icons.star,color: Colors.amber,),
-                  Icon(Icons.star,color: Colors.amber,),
-                  Icon(Icons.star,color: Colors.amber,),
-                  Icon(Icons.star_half_sharp,color: Colors.amber,),
-                ],),
+                padding: const EdgeInsets.only(left:0.0),
+                child:Column(
+                  children: [
+                    GFRating(
+
+                      value: _homePageProvider.userRating,
+                      onChanged: (value)async{
+                          _homePageProvider.userRating=value;
+
+                        await _homePageProvider.setRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title, user.uid, value).then((value) =>print("başarılı"));
+
+                       await _homePageProvider.getRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title);
+                       await _homePageProvider.getUserRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title,user.uid);
+
+    },
+                      borderColor: Colors.orange,
+                      color: Colors.orange,
+                      size: 27,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Park Puanı: "+_homePageProvider.ortRating.toString().trim(),style: TextStyle(color: Colors.grey),),
+                    )
+                  ],
+                )
               ),
               Padding(
                 padding: const EdgeInsets.only(left:40.0),
                 child: Row(
                   children: [
                     Icon(Icons.location_on),
-                    Expanded(child: Text(_homePageProvider.parkList[_homePageProvider.parkListPosition-1].description,style: TextStyle(color: Colors.grey,fontSize: 12),))
+                    Expanded(child: Text(_homePageProvider.parkList[_homePageProvider.parkListPosition].description,style: TextStyle(color: Colors.grey,fontSize: 12),))
                   ],
                 ),
               ),
@@ -525,6 +780,84 @@ String path= "asset/YesilMarker.png";
   void afterFirstLayout(BuildContext context) async{
     // TODO: implement afterFirstLayout
 
+    await _homePageProvider.getRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title);
+    await  _homePageProvider.getUserRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title,user.uid);
+
+
+
+
   }
 
+}
+
+class FilterButton extends StatefulWidget {
+   FilterButton({
+    Key key,
+    this.select, this.name1, this.homePageProvider, this.index,
+  }) : super(key: key);
+
+  bool select;
+  final String name1;
+  final HomePageProvider homePageProvider;
+  final int index;
+
+  @override
+  _FilterButtonState createState() => _FilterButtonState();
+}
+
+class _FilterButtonState extends State<FilterButton> {
+  
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: (){
+        switch(widget.index){
+          case 0:
+            widget.homePageProvider.spor==false?widget.homePageProvider.spor=true:widget.homePageProvider.spor=false;
+            break;
+          case 1:
+            widget.homePageProvider.cocukPark==false?widget.homePageProvider.cocukPark=true:widget.homePageProvider.cocukPark=false;
+            break;
+          case 2:
+            widget.homePageProvider.yemek==false?widget.homePageProvider.yemek=true:widget.homePageProvider.yemek=false;
+            break;
+          case 3:
+            widget.homePageProvider.wc==false?widget.homePageProvider.wc=true:widget.homePageProvider.wc=false;
+            break;
+          case 4:
+            widget.homePageProvider.bisiklet==false?widget.homePageProvider.bisiklet=true:widget.homePageProvider.bisiklet=false;
+            break;
+          case 5:
+            widget.homePageProvider.kosuPark==false?widget.homePageProvider.kosuPark=true:widget.homePageProvider.kosuPark=false;
+            break;
+          case 6:
+            widget.homePageProvider.ethernet==false?widget.homePageProvider.ethernet=true:widget.homePageProvider.ethernet=false;
+            break;
+        }
+
+
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            border:widget.select==true? Border.all(color: Colors.green): Border.all(color: Colors.white),
+            boxShadow: [BoxShadow(color: Colors.black26,offset: Offset(2,2),blurRadius: 10)],
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20)
+        ),
+        height: 30,
+        width: 120,
+        child:  Center(child: Padding(
+          padding: const EdgeInsets.only(left:16.0),
+          child: Row(
+            children: [
+              Visibility(
+                  visible: widget.select==true?true:false,
+                  child: Icon(Icons.check,color: Colors.green)),
+              Text(widget.name1,style: TextStyle(fontSize: 10),),
+            ],
+          ),
+        )),
+      ),
+    );
+  }
 }

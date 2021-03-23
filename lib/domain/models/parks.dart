@@ -7,6 +7,7 @@ class Parks{
   LatLng coords;
   String coords1;
   String coords2;
+  bool kosuPark=false;
 
   Parks({this.coords,this.description,this.photo,this.title,this.coords2,this.coords1});
 
@@ -16,7 +17,8 @@ class Parks{
         title = map["title"],
         photo = map["photo"],
         coords1 = map["coords1"],
-        coords2 = map["coords2"];
+        coords2 = map["coords2"],
+        kosuPark = map["kosupark"];
 
 }
 

@@ -65,7 +65,7 @@ Future<double> getRating(String parkname)async {
     await ratingList.get().then((value) {
       Map d=value.data();
       rating=d['value'];
-      print(value.data().toString());
+      print(value.data().toString()+"user rating");
     });
 
     return  rating;

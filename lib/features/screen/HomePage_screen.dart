@@ -19,27 +19,15 @@ HomePageProvider _homePageProvider;
 
 @override
 void afterFirstLayout(BuildContext context)async {
-
-  await _homePageProvider.getParkList();
-  _homePageProvider.checkFilter();
+  _homePageProvider.userRating=1;
+  await _homePageProvider.getParkList().then((value) {
+    _homePageProvider.checkFilter();
+  });
 
 }
 
 
-Future<double> _getSavedWeightNote() async {
-  String sharedData = await const MethodChannel('app.channel.shared.data')
-      .invokeMethod("getSavedNote");
-  if (sharedData != null) {
-    int firstIndex = sharedData.indexOf(new RegExp("[0-9]"));
-    int lastIndex = sharedData.lastIndexOf(new RegExp("[0-9]"));
-    if (firstIndex != -1) {
-      String number = sharedData.substring(firstIndex, lastIndex + 1);
-      double num = double.parse(number, (error) => null);
-      return num;
-    }
-  }
-  return null;
-}
+
 @override
   void initState() {
 
@@ -53,8 +41,13 @@ Future<double> _getSavedWeightNote() async {
     _homePageProvider=Provider.of<HomePageProvider>(context);
     return Scaffold(
       body: Stack(children:[
+        Visibility(
+            visible: _homePageProvider.isLoading,
+            child: Center(child: CircularProgressIndicator())),
 
-        HomePageWidget(homePageProvider: _homePageProvider,)]),
+        Visibility(
+            visible: !_homePageProvider.isLoading,
+            child: HomePageWidget(homePageProvider: _homePageProvider,))]),
     );
   }
 

@@ -1,9 +1,16 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:solution_challenge/domain/models/parks.dart';
 import 'package:solution_challenge/domain/repository/remote_source.dart';
 import 'package:solution_challenge/domain/repository/repo.dart';
 import 'package:solution_challenge/features/widgets/appexpansion.dart';
+import 'dart:ui' as ui;
+
 
 abstract class HomePageProviderAbs{
   onMapCreated(controller);
@@ -54,15 +61,27 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
 
   bool _isLoading=true;
   bool _spor=false;
-  bool _cocukPark=false;
+  bool _engellidostu=false;
   bool _yemek=false;
   bool _wc=false;
-  bool _bisiklet=false;
-  bool _kosuPark=false;
-  bool _ethernet=false;
+  bool _kultureloge=false;
+  bool _otopark=false;
+  bool _oturmaalani=false;
+  bool _expansionState=false;
+
+  bool get expansionState => _expansionState;
+
+
 
   double _ortRating;
-  double userRating=1;
+  double _userRating=1;
+
+  double get userRating => _userRating;
+
+  set userRating(double value) {
+    _userRating = value;
+    notifyListeners();
+  }
 
   double get ortRating => _ortRating;
 
@@ -79,7 +98,10 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
   }
 
 
-
+  set expansionState(bool value) {
+    _expansionState = value;
+    notifyListeners();
+  }
 
   ProductRepository _productRepository=   ProductRepository();
 
@@ -88,7 +110,7 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
   bool _detailvisiblity=false;
 
 
-  double _opacity=0.6;
+  double _opacity=0.1;
 
   bool get detailvisiblity => _detailvisiblity;
 
@@ -159,22 +181,22 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
   }
 
   onMapCreated(controller)async{
-    BitmapDescriptor  mapMarker=await BitmapDescriptor.fromAssetImage(ImageConfiguration(), "asset/markeragac.png");
-
+    BitmapDescriptor  mapMarker;
+      await BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(40, 40,),devicePixelRatio: 10), "asset/markeragac.png").then((value) {
+      mapMarker=value;
+    });
     _controller=controller;
-      parkList.forEach((element) async{
+    parkList.forEach((element) async{
         LatLng coords=LatLng(double.parse(element.coords1),double.parse(element.coords2));
-          print("2132"+element.coords1);
-          markers.add(Marker(
+        markers.add(Marker(
             icon: mapMarker,
-              markerId: MarkerId(element.title),
-              infoWindow: InfoWindow(title: element.title, snippet: element.description),
-              position:coords));
+            markerId: MarkerId(element.title),
+            infoWindow: InfoWindow(title: element.title, snippet: element.description),
+            position:coords));
 
 
-
-      });
-      notifyListeners();
+    });
+    notifyListeners();
   }
 
   moveCamera() {
@@ -189,6 +211,7 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
     await _productRepository.getParkList().then((value) {
     park=value;
     isLoading=false;
+
     });
     notifyListeners();
   }
@@ -201,15 +224,19 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
     var d=await _productRepository.getRating(parkname);
     ortRating=d.isNaN==true?1:d;
     print(ortRating.toString()+"provider");
+
     notifyListeners();
+
   }
 
   Future getUserRating(String parkname,var uid)async{
    var d= await _productRepository.getUserRating(parkname, uid);
-   userRating =d.isNaN==true?1:d;
+   print(d.toString()+"user provider");
+   if(d!=null){
+     userRating=d;
+   }
 
-   notifyListeners();
-
+notifyListeners();
 
   }
 
@@ -224,17 +251,20 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
   }
 
   checkMenuVisibility(){
-    if(opacity>=0.9){
+    if(opacity>=0.8){
       return false;
-    }else{
+    }else if(expansionState==true){
+      return false;
+    }
+    else{
       return true;
     }
   }
 
-  bool get cocukPark => _cocukPark;
+  bool get engellidostu => _engellidostu;
 
-  set cocukPark(bool value) {
-    _cocukPark = value;
+  set engellidostu(bool value) {
+    _engellidostu = value;
     notifyListeners();
   }
 
@@ -252,42 +282,83 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
     notifyListeners();
   }
 
-  bool get bisiklet => _bisiklet;
+  bool get kultureloge => _kultureloge;
 
-  set bisiklet(bool value) {
-    _bisiklet = value;
+  set kultureloge(bool value) {
+    _kultureloge = value;
     notifyListeners();
   }
 
-  bool get kosuPark => _kosuPark;
+  bool get otopark => _otopark;
 
-  set kosuPark(bool value) {
-    _kosuPark = value;
+  set otopark(bool value) {
+    _otopark = value;
     notifyListeners();
   }
 
-  bool get ethernet => _ethernet;
+  bool get oturmaalani => _oturmaalani;
 
-  set ethernet(bool value) {
-    _ethernet = value;
+  set oturmaalani(bool value) {
+    _oturmaalani = value;
     notifyListeners();
   }
 
   checkFilter(){
     parkList.clear();
     ///eğer tüm koşullar true ise
-    if(kosuPark==true){
-
-      if(kosuPark==true){
-        List.generate(park.length, (index) {
-          if(park[index].kosuPark==true){
-            parkList.add(park[index]);
-            notifyListeners();
-          }
-        });
+if(otopark==true||oturmaalani==true||engellidostu==true||kultureloge==true||spor==true||wc==true||yemek==true){
+  if(otopark==true){
+    List.generate(park.length, (index) {
+      if(park[index].kosuPark==true){
+        parkList.add(park[index]);
+        notifyListeners();
       }
-
-    }else{
+    });
+  }  if(oturmaalani==true){
+    List.generate(park.length, (index) {
+      if(park[index].oturmaalani==true){
+        parkList.add(park[index]);
+        notifyListeners();
+      }
+    });
+  }  if(engellidostu==true){
+    List.generate(park.length, (index) {
+      if(park[index].engellidostu==true){
+        parkList.add(park[index]);
+        notifyListeners();
+      }
+    });
+  }if(kultureloge==true){
+    List.generate(park.length, (index) {
+      if(park[index].kultureloge==true){
+        parkList.add(park[index]);
+        notifyListeners();
+      }
+    });
+  }if(spor==true){
+    List.generate(park.length, (index) {
+      if(park[index].kosuPark==true){
+        parkList.add(park[index]);
+        notifyListeners();
+      }
+    });
+  }if(wc==true){
+    List.generate(park.length, (index) {
+      if(park[index].tuvalet==true){
+        parkList.add(park[index]);
+        notifyListeners();
+      }
+    });
+  }
+  if(yemek==true){
+    List.generate(park.length, (index) {
+      if(park[index].yemeicme==true){
+        parkList.add(park[index]);
+        notifyListeners();
+      }
+    });
+  }
+} else{
       List.generate(park.length, (index) {
           parkList.add(park[index]);
       });

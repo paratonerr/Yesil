@@ -8,6 +8,7 @@ import 'package:solution_challenge/features/provider/HomePage_provider.dart';
 import 'package:solution_challenge/features/screen/HomePage_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:solution_challenge/features/screen/account/login_screen.dart';
+import 'package:solution_challenge/features/screen/account/profil_screen.dart';
 import 'package:solution_challenge/features/screen/onboarding_screen.dart';
 import 'package:solution_challenge/utils/SlideLeftRoutes.dart';
 
@@ -71,7 +72,7 @@ class _MyAppState extends State<MyApp> with AfterLayoutMixin<MyApp> {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
         routes: {
-        "/": (context)=>HomePage()
+        "/": (context)=>LoginScreen()
         },
 
         onGenerateRoute:(settings){
@@ -81,6 +82,9 @@ class _MyAppState extends State<MyApp> with AfterLayoutMixin<MyApp> {
             break;
           case "/home":
             return SlideLeftRoute(page: HomePage());
+            break;
+          case "/profil":
+            return SlideLeftRoute(page: Profil_Screen());
             break;
           default:
             return SlideLeftRoute(page: LoginScreen());

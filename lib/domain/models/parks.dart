@@ -8,6 +8,12 @@ class Parks{
   String coords1;
   String coords2;
   bool kosuPark=false;
+  bool engellidostu=false;
+  bool kultureloge=false;
+  bool otopark=false;
+  bool oturmaalani=false;
+  bool tuvalet=false;
+  bool yemeicme=false;
 
   Parks({this.coords,this.description,this.photo,this.title,this.coords2,this.coords1});
 
@@ -18,7 +24,13 @@ class Parks{
         photo = map["photo"],
         coords1 = map["coords1"],
         coords2 = map["coords2"],
-        kosuPark = map["kosupark"];
+        otopark = map["otopark"],
+        tuvalet = map["tuvalet"],
+        yemeicme = map["yemeicme"],
+        oturmaalani = map["oturmaalani"],
+        kultureloge = map["kultureloge"],
+        engellidostu = map["engellidostu"],
+        kosuPark = map["sporalani"];
 
 }
 

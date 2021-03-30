@@ -23,18 +23,30 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_maps_flutter: ^2.0.1
+  google_maps_flutter: 1.2.0
   provider: ^4.3.3
-  cloud_firestore: 1.0.1
-  firebase_core: 1.0.2
+  cloud_firestore: 0.16.0
+  firebase_core: 0.7.0
   after_layout: ^1.0.7+2
   intro_slider: ^2.3.4
   google_sign_in: 4.5.9
-  firebase_auth: 1.0.1
+  firebase_auth: 0.20.0
   filter_list: ^0.0.6
   redux: ^3.0.0
   flutter_redux: ^0.5.2
   getwidget: ^1.1.0
+  flutter_localizations:
+    sdk: flutter
+  flutter_bloc: ^3.1.0
+  flutter_svg: ^0.19.0
+  shared_preferences: ^0.5.6
+  maps_launcher: 1.0.1
+  firebase_ml_vision: 0.10.0
+  image_picker: ^0.6.3+4
+
+
+
+
 
 
 
@@ -68,6 +80,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - asset/
+    - langs/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/progress_bar/gf_progress_bar.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:solution_challenge/utils/Routes.dart';
+import 'package:solution_challenge/utils/app_localizations.dart';
 
 class Profil_Screen extends StatefulWidget {
   @override
@@ -18,6 +23,36 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
   PageController pageController;
   List<String> rozet;
   List<String> rozetName;
+
+
+
+  _loadAsset()async{
+    List<String> responseLabel= [];
+
+    final imageFile = await ImagePicker().getImage(source: ImageSource.gallery);
+
+    FirebaseVisionImage image =FirebaseVisionImage.fromFile(File(imageFile.path));
+    ImageLabeler label =FirebaseVision.instance.imageLabeler(ImageLabelerOptions(confidenceThreshold: 0.70));
+
+    List<ImageLabel> labels= await label.processImage(image);
+
+    for(ImageLabel label in labels){
+      responseLabel.add(label.text);
+    }
+
+    responseLabel.forEach((element) {
+      if(element=='Cat'){
+        showDialog(context: context, builder:(context){
+          return AlertDialog(title: Text("tebrikler"),);
+        });
+      }
+
+    });
+
+
+  }
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -106,7 +141,7 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                                                 onTap: ()async{
                                                   _googleSignIn.signOut().then((value) {
 
-                                                    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+                                                    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.init_language, (route) => false);
 
                                                   });
 
@@ -166,10 +201,10 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                   tabs: [
                     Container(
                         height: 50,
-                        child: Center(child: Text("Profil",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w700,fontSize: 18),))),
+                        child: Center(child: Text(AppLocalizations.getString('profile'),style: TextStyle(color: Colors.black,fontWeight: FontWeight.w700,fontSize: 18),))),
                     Container(
                         height: 50,
-                        child: Center(child: Text("Başarımlar",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w700,fontSize: 18),))),
+                        child: Center(child: Text(AppLocalizations.getString('basarimlar'),style: TextStyle(color: Colors.black,fontWeight: FontWeight.w700,fontSize: 18),))),
                   ]),
                    Container(
                 width:MediaQuery.of(context).size.width,
@@ -183,7 +218,7 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Padding(padding: EdgeInsets.only(right: 13,top:40),
-                          child: Text("Seviye 2",style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w500),),
+                          child: Text(AppLocalizations.getString('level'),style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w500),),
 
                           ),
                         ],
@@ -242,7 +277,7 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                                    ],
                                  ),
                                  SizedBox(height: 10,),
-                                 Text("Keşfedilen Yeşil Alanlar",style: TextStyle(fontSize: 10,fontWeight: FontWeight.w700),)
+                                 Text(AppLocalizations.getString('green_areas_discovered'),style: TextStyle(fontSize: 10,fontWeight: FontWeight.w700),)
                                ],
                              ),
                              decoration: BoxDecoration(
@@ -275,7 +310,7 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                                    ],
                                  ),
                                  SizedBox(height: 10,),
-                                 Text("Tamamlanan Görevler",style: TextStyle(fontSize: 10,fontWeight: FontWeight.w700),)
+                                 Text(AppLocalizations.getString('completed_tasks'),style: TextStyle(fontSize: 10,fontWeight: FontWeight.w700),)
                                ],
                              ),
                              decoration: BoxDecoration(
@@ -306,19 +341,75 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                         child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: rozet.length,itemBuilder: (context,index){
-                          return Padding(padding: EdgeInsets.all(10),
-                          child:   Container(
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(rozet[index])
+                          return InkWell(
+                            onTap: (){
+                              showDialog(context: context, builder: (context){
+                                return AlertDialog(
+                                  content:Container(
+                                    color: Colors.white,
+                                    height: 240,
+                                    width: 200,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(bottom:150.0,left: 10,right: 10),
+                                          child: Text("Görev",style: TextStyle(fontWeight: FontWeight.w700),),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              flex:1,
+                                              child: InkWell(
+                                                onTap:()async{
+                                                  await _loadAsset();
+                                                },
+                                                child: Container(
+                                                  height: 60,
+                                                  child:Center(child: Text("BAŞLA",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700,fontSize: 20),)),
+                                                  color: Colors.green.shade700,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: 6,),
+                                            Expanded(
+                                              flex:1,
+                                              child: InkWell(
+                                                onTap: (){
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Container(
+                                                  height: 60,
+                                                  child:Center(child: Text("İPTAL",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700,fontSize: 20),)),
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+
+                              });
+
+
+                            },
+                            child: Padding(padding: EdgeInsets.all(10),
+                            child:   Container(
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage(rozet[index])
+                                ),
+                                  borderRadius: BorderRadius.circular(50)
                               ),
-                                borderRadius: BorderRadius.circular(50)
+                              height: 30,
+                              width: 60,
+
+                            )
+
                             ),
-                            height: 30,
-                            width: 60,
-
-                          )
-
                           );
 
 

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+
 import 'package:after_layout/after_layout.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,9 @@ import 'package:solution_challenge/features/provider/HomePage_provider.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:solution_challenge/features/widgets/appexpansion.dart';
 import 'package:solution_challenge/utils/Routes.dart';
+import 'package:solution_challenge/utils/app_localizations.dart';
+import 'package:maps_launcher/maps_launcher.dart';
+
 
 class HomePageWidget extends StatefulWidget {
   final HomePageProvider homePageProvider;
@@ -59,13 +63,13 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
     }
     );
 
-    _homePageProvider.filter.add("Spor Alanları");
-    _homePageProvider.filter.add("Engelli Dostu");
-    _homePageProvider.filter.add("Yeme İçme");
-    _homePageProvider.filter.add("Tuvalet");
-    _homePageProvider.filter.add("Kültürel Öğre");
-    _homePageProvider.filter.add("Otopark");
-    _homePageProvider.filter.add("Oturma Alanı");
+    _homePageProvider.filter.add(AppLocalizations.getString('sit_field'));
+    _homePageProvider.filter.add(AppLocalizations.getString('accessible'));
+    _homePageProvider.filter.add(AppLocalizations.getString('eat'));
+    _homePageProvider.filter.add(AppLocalizations.getString('wc'));
+    _homePageProvider.filter.add(AppLocalizations.getString('culture'));
+    _homePageProvider.filter.add(AppLocalizations.getString('car_park'));
+    _homePageProvider.filter.add(AppLocalizations.getString('car_park'));
 
 
 
@@ -92,6 +96,8 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
                 child: GoogleMap(
+                  myLocationButtonEnabled: true,
+                  myLocationEnabled: true,
                   mapToolbarEnabled: false,
                   zoomControlsEnabled: false,
                   markers: Set.from(_homePageProvider.markers),
@@ -204,7 +210,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                                             color: Colors.grey,
                                           ),
                                         ),
-                                        Text("Ayrıntılar için yukarı kaydırın",style: TextStyle(color: Colors.grey),),
+                                        Text(AppLocalizations.getString('slide_detail'),style: TextStyle(color: Colors.grey),),
                                         Visibility(
                                           visible: !_homePageProvider.checkMenuVisibility(),
                                           child: Column(children: [
@@ -215,19 +221,19 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                                             ),
                                             SingleChildScrollView(
                                               child: Column(children: [
-                                                detailCard(title: "Engelli Dostu",icon: Icons.accessible,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].engellidostu),
+                                                detailCard(title: AppLocalizations.getString('accessible'),icon: Icons.accessible,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].engellidostu),
                                                 SizedBox(height: 30,),
-                                                detailCard(title: "Spor Alanları",icon: Icons.fitness_center,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].kosuPark),
+                                                detailCard(title:  AppLocalizations.getString('sport_field'),icon: Icons.fitness_center,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].kosuPark),
                                                 SizedBox(height: 30,),
-                                                detailCard(title: "Yeme İçme",icon: Icons.free_breakfast,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].yemeicme),
+                                                detailCard(title:  AppLocalizations.getString('eat'),icon: Icons.free_breakfast,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].yemeicme),
                                                 SizedBox(height: 30,),
-                                                detailCard(title: "Tuvalet",icon: Icons.wc,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].tuvalet),
+                                                detailCard(title:  AppLocalizations.getString('wc'),icon: Icons.wc,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].tuvalet),
                                                 SizedBox(height: 30,),
-                                                detailCard(title: "Kültürel Öğe",icon: Icons.museum,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].kultureloge),
+                                                detailCard(title:  AppLocalizations.getString('culture'),icon: Icons.museum,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].kultureloge),
                                                 SizedBox(height: 30,),
-                                                detailCard(title: "Otopark",icon: Icons.directions_car,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].otopark),
+                                                detailCard(title:  AppLocalizations.getString('car_park'),icon: Icons.directions_car,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].otopark),
                                                 SizedBox(height: 30,),
-                                                detailCard(title: "Oturma Alanı",icon: Icons.airline_seat_recline_normal,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].oturmaalani),
+                                                detailCard(title:  AppLocalizations.getString('sit_field'),icon: Icons.airline_seat_recline_normal,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].oturmaalani),
                                               ],),
                                             ),
 
@@ -502,8 +508,8 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                   Stack(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left:40.0,right: 10),
-                        child: Text("Filtrelemek için dokunun",style: TextStyle(color:_homePageProvider.oturmaalani==true||_homePageProvider.otopark==true||_homePageProvider.kultureloge==true||_homePageProvider.yemek==true||_homePageProvider.wc==true||_homePageProvider.engellidostu==true||_homePageProvider.spor==true?Colors.white:Colors.grey),),
+                        padding: const EdgeInsets.only(left:40.0,right: 80),
+                        child: Expanded(child: Text(AppLocalizations.getString('filter'),style: TextStyle(color:_homePageProvider.oturmaalani==true||_homePageProvider.otopark==true||_homePageProvider.kultureloge==true||_homePageProvider.yemek==true||_homePageProvider.wc==true||_homePageProvider.engellidostu==true||_homePageProvider.spor==true?Colors.white:Colors.grey),)),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left:11.0,top:2),
@@ -918,7 +924,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
             child: Container(
               decoration: BoxDecoration(
                   image: DecorationImage(
-                      image:NetworkImage(_homePageProvider.parkList[_homePageProvider.parkListPosition+1].photo),
+                      image:NetworkImage(_homePageProvider.parkList[_homePageProvider.parkListPosition].photo),
                       fit: BoxFit.cover
                   ),
                   borderRadius: BorderRadius.only(
@@ -935,7 +941,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
         Expanded(
           child: Column(
             children: [
-              Text(_homePageProvider.parkList[_homePageProvider.parkListPosition+1].title,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w800),),
+              Text(_homePageProvider.parkList[_homePageProvider.parkListPosition].title,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w800),),
               Padding(
                 padding: const EdgeInsets.only(left:0.0),
                 child:Column(
@@ -950,10 +956,10 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                         });
                           _homePageProvider.userRating=value;
 
-                        await _homePageProvider.setRating(_homePageProvider.parkList[_homePageProvider.parkListPosition+1].title, user.uid, value).then((value) =>print("başarılı"));
+                        await _homePageProvider.setRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title, user.uid, value).then((value) =>print("başarılı"));
 
-                       await _homePageProvider.getRating(_homePageProvider.parkList[_homePageProvider.parkListPosition+1].title);
-                       await _homePageProvider.getUserRating(_homePageProvider.parkList[_homePageProvider.parkListPosition+1].title,user.uid);
+                       await _homePageProvider.getRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title);
+                       await _homePageProvider.getUserRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title,user.uid);
                         ratingValue= _homePageProvider.userRating;
 
     },
@@ -973,21 +979,29 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                 child: Row(
                   children: [
                     Icon(Icons.location_on),
-                    Expanded(child: Text(_homePageProvider.parkList[_homePageProvider.parkListPosition+1].description,style: TextStyle(color: Colors.grey,fontSize: 12),))
+                    Expanded(child: Text(_homePageProvider.parkList[_homePageProvider.parkListPosition].description,style: TextStyle(color: Colors.grey,fontSize: 12),))
                   ],
                 ),
               ),
               SizedBox(height: 20,),
-              Padding(
-                padding: const EdgeInsets.only(right:16.0),
-                child: Container(
-                  child: Center(child: Text("Beni buraya götür!",style: TextStyle(color: Colors.white),)),
-                  decoration: BoxDecoration(
-                      color: Color(0xff00524E),
-                      borderRadius: BorderRadius.circular(10)
+              InkWell(
+                onTap: (){
+                  print(double.parse(_homePageProvider.parkList[_homePageProvider.parkListPosition].coords1));
+                  MapsLauncher.launchCoordinates(
+                  double.parse(_homePageProvider.parkList[_homePageProvider.parkListPosition].coords1),double.parse(_homePageProvider.parkList[_homePageProvider.parkListPosition].coords2),_homePageProvider.parkList[_homePageProvider.parkListPosition].title );
+
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(right:16.0),
+                  child: Container(
+                    child: Center(child: Text(AppLocalizations.getString('take_me_here'),style: TextStyle(color: Colors.white),)),
+                    decoration: BoxDecoration(
+                        color: Color(0xff00524E),
+                        borderRadius: BorderRadius.circular(10)
+                    ),
+                    height: 40,
+                    width: 140,
                   ),
-                  height: 40,
-                  width: 140,
                 ),
               )
             ],
@@ -1039,8 +1053,8 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
   void afterFirstLayout(BuildContext context) async{
     // TODO: implement afterFirstLayout
 
-    await _homePageProvider.getRating(_homePageProvider.parkList[_homePageProvider.parkListPosition+1].title);
-    await  _homePageProvider.getUserRating(_homePageProvider.parkList[_homePageProvider.parkListPosition+1].title,user.uid);
+    await _homePageProvider.getRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title);
+    await  _homePageProvider.getUserRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title,user.uid);
 
 
 

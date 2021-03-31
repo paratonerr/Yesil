@@ -946,8 +946,8 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                 padding: const EdgeInsets.only(left:0.0),
                 child:Column(
                   children: [
-                    GFRating(
 
+                    GFRating(
                       value: _homePageProvider.userRating,
                       onChanged: (value)async{
                         setState(() {

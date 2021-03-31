@@ -12,10 +12,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:solution_challenge/features/screen/account/login_screen.dart';
 import 'package:solution_challenge/features/screen/account/profil_screen.dart';
 import 'package:solution_challenge/features/screen/initLanguage_screen.dart';
+import 'package:solution_challenge/features/screen/mission_carousel.dart';
 import 'package:solution_challenge/features/screen/onboarding_screen.dart';
 import 'package:solution_challenge/features/screen/testlaunchmap.dart';
 import 'package:solution_challenge/utils/SlideLeftRoutes.dart';
 import 'package:solution_challenge/utils/bloc_localization.dart';
+import 'features/screen/HomePage_screen.dart';
 
 
 void main() async {
@@ -82,8 +84,13 @@ class _MyAppState extends State<MyApp> with AfterLayoutMixin<MyApp> {
                 case "/login":
                   return SlideLeftRoute(page: LoginScreen());
                   break;
+
                 case "/home":
-                  return SlideLeftRoute(page: HomePage());
+                  return SlideLeftRoute(page: HomePage_Screen());
+                  break;
+
+                case "/onboard_mission":
+                  return SlideLeftRoute(page: OnBoardingMissionPage());
                   break;
                 case "/profil":
                   return SlideLeftRoute(page: Profil_Screen());

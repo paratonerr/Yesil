@@ -32,7 +32,7 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
     final imageFile = await ImagePicker().getImage(source: ImageSource.gallery);
 
     FirebaseVisionImage image =FirebaseVisionImage.fromFile(File(imageFile.path));
-    ImageLabeler label =FirebaseVision.instance.imageLabeler(ImageLabelerOptions(confidenceThreshold: 0.70));
+    ImageLabeler label =FirebaseVision.instance.imageLabeler(ImageLabelerOptions(confidenceThreshold: 0.50));
 
     List<ImageLabel> labels= await label.processImage(image);
 
@@ -41,9 +41,246 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
     }
 
     responseLabel.forEach((element) {
+      print(element);
       if(element=='Cat'){
         showDialog(context: context, builder:(context){
-          return AlertDialog(title: Text("tebrikler"),);
+          return AlertDialog(
+            title: Container(
+              height: 200,
+              width: 200,
+              decoration: BoxDecoration(
+                  image: DecorationImage(image: AssetImage("asset/tebrikler.png"),fit: BoxFit.cover)
+              ),
+            ),
+            content: Padding(
+              padding: const EdgeInsets.only(left:70.0),
+              child: Text("Nice Work!",style: TextStyle(fontWeight: FontWeight.w700,fontSize:19),),
+            ),
+
+            actions: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(left:16.0,right:8,bottom:20),
+                  child: Text("We've added your rewars to your acount \n"
+                      "After youe've finished gazing at your hardearned trophy \n"
+                      "you can close this page by pressing done"
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right:30.0),
+                child: InkWell(
+                  onTap: (){
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    child: Center(child:Text("Done ",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 20,color: Colors.white),)),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color:Color(0xff00524E),
+
+                    ),
+                    height: 60,
+                    width: 200,
+                  ),
+                ),
+              ),
+            ],
+
+
+          );
+        });
+      }else  if(element=='Forest'){
+        showDialog(context: context, builder:(context){
+          return AlertDialog(
+            title: Container(
+              height: 200,
+              width: 200,
+              decoration: BoxDecoration(
+                  image: DecorationImage(image: AssetImage("asset/tebrikler.png"),fit: BoxFit.cover)
+              ),
+            ),
+            content: Padding(
+              padding: const EdgeInsets.only(left:70.0),
+              child: Text("Nice Work!",style: TextStyle(fontWeight: FontWeight.w700,fontSize:19),),
+            ),
+
+            actions: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(left:16.0,right:8,bottom:20),
+                  child: Text("We've added your rewars to your acount \n"
+                      "After youe've finished gazing at your hardearned trophy \n"
+                      "you can close this page by pressing done"
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right:30.0),
+                child: InkWell(
+                  onTap: (){
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    child: Center(child:Text("Done ",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 20,color: Colors.white),)),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color:Color(0xff00524E),
+
+                    ),
+                    height: 60,
+                    width: 200,
+                  ),
+                ),
+              ),
+            ],
+
+
+          );
+        });
+      }else  if(element=='Plant'){
+        showDialog(context: context, builder:(context){
+          return AlertDialog(
+            title: Container(
+              height: 200,
+              width: 200,
+              decoration: BoxDecoration(
+                  image: DecorationImage(image: AssetImage("asset/tebrikler.png"),fit: BoxFit.cover)
+              ),
+            ),
+            content: Padding(
+              padding: const EdgeInsets.only(left:70.0),
+              child: Text("Nice Work!",style: TextStyle(fontWeight: FontWeight.w700,fontSize:19),),
+            ),
+
+            actions: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(left:16.0,right:8,bottom:20),
+                  child: Text("We've added your rewars to your acount \n"
+                      "After youe've finished gazing at your hardearned trophy \n"
+                      "you can close this page by pressing done"
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right:30.0),
+                child: InkWell(
+                  onTap: (){
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    child: Center(child:Text("Done ",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 20,color: Colors.white),)),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color:Color(0xff00524E),
+
+                    ),
+                    height: 60,
+                    width: 200,
+                  ),
+                ),
+              ),
+            ],
+
+
+          );
+        });
+      }else  if(element=='Jungle'){
+        showDialog(context: context, builder:(context){
+          return AlertDialog(
+            title: Container(
+              height: 200,
+              width: 200,
+              decoration: BoxDecoration(
+                  image: DecorationImage(image: AssetImage("asset/tebrikler.png"),fit: BoxFit.cover)
+              ),
+            ),
+            content: Padding(
+              padding: const EdgeInsets.only(left:70.0),
+              child: Text("Nice Work!",style: TextStyle(fontWeight: FontWeight.w700,fontSize:19),),
+            ),
+
+            actions: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(left:16.0,right:8,bottom:20),
+                  child: Text("We've added your rewars to your acount \n"
+                      "After youe've finished gazing at your hardearned trophy \n"
+                      "you can close this page by pressing done"
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right:30.0),
+                child: InkWell(
+                  onTap: (){
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    child: Center(child:Text("Done ",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 20,color: Colors.white),)),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color:Color(0xff00524E),
+
+                    ),
+                    height: 60,
+                    width: 200,
+                  ),
+                ),
+              ),
+            ],
+
+
+          );
+        });
+      }else  if(element=='Handbag'){
+        showDialog(context: context, builder:(context){
+          return AlertDialog(
+            title: Container(
+              height: 200,
+              width: 200,
+              decoration: BoxDecoration(
+                  image: DecorationImage(image: AssetImage("asset/tebrikler.png"),fit: BoxFit.cover)
+              ),
+            ),
+            content: Padding(
+              padding: const EdgeInsets.only(left:70.0),
+              child: Text("Nice Work!",style: TextStyle(fontWeight: FontWeight.w700,fontSize:19),),
+            ),
+
+            actions: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(left:16.0,right:8,bottom:20),
+                  child: Text("We've added your rewars to your acount \n"
+                      "After youe've finished gazing at your hardearned trophy \n"
+                      "you can close this page by pressing done"
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right:30.0),
+                child: InkWell(
+                  onTap: (){
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    child: Center(child:Text("Done ",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 20,color: Colors.white),)),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color:Color(0xff00524E),
+
+                    ),
+                    height: 60,
+                    width: 200,
+                  ),
+                ),
+              ),
+            ],
+
+
+          );
         });
       }
 
@@ -343,59 +580,9 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                             itemCount: rozet.length,itemBuilder: (context,index){
                           return InkWell(
                             onTap: (){
-                              showDialog(context: context, builder: (context){
-                                return AlertDialog(
-                                  content:Container(
-                                    color: Colors.white,
-                                    height: 240,
-                                    width: 200,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(bottom:150.0,left: 10,right: 10),
-                                          child: Text("Görev",style: TextStyle(fontWeight: FontWeight.w700),),
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              flex:1,
-                                              child: InkWell(
-                                                onTap:()async{
-                                                  await _loadAsset();
-                                                },
-                                                child: Container(
-                                                  height: 60,
-                                                  child:Center(child: Text("BAŞLA",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700,fontSize: 20),)),
-                                                  color: Colors.green.shade700,
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(width: 6,),
-                                            Expanded(
-                                              flex:1,
-                                              child: InkWell(
-                                                onTap: (){
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Container(
-                                                  height: 60,
-                                                  child:Center(child: Text("İPTAL",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700,fontSize: 20),)),
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                );
 
-                              });
+                             Navigator.pushNamed(context, AppRoutes.onboard_mission).then((value) async{ await _loadAsset();});},
 
-
-                            },
                             child: Padding(padding: EdgeInsets.all(10),
                             child:   Container(
                               decoration: BoxDecoration(

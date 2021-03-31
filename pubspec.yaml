@@ -24,6 +24,8 @@ dependencies:
   flutter:
     sdk: flutter
   google_maps_flutter: 1.2.0
+  introduction_screen: ^1.0.9
+  rating_dialog: ^1.0.0
   provider: ^4.3.3
   cloud_firestore: 0.16.0
   firebase_core: 0.7.0

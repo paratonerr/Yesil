@@ -6,15 +6,15 @@ import 'package:provider/provider.dart';
 import 'package:solution_challenge/domain/repository/remote_source.dart';
 import 'package:solution_challenge/features/provider/HomePage_provider.dart';
 import 'package:solution_challenge/features/widgets/HomePage_widget.dart';
-class HomePage extends StatefulWidget {
 
 
+class HomePage_Screen extends StatefulWidget {
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePage_ScreenState createState() => _HomePage_ScreenState();
 }
 
-class _HomePageState extends State<HomePage> with AfterLayoutMixin{
+class _HomePage_ScreenState extends State<HomePage_Screen> with AfterLayoutMixin{
 HomePageProvider _homePageProvider;
 
 @override

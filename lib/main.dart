@@ -18,6 +18,7 @@ import 'package:solution_challenge/features/screen/testlaunchmap.dart';
 import 'package:solution_challenge/utils/SlideLeftRoutes.dart';
 import 'package:solution_challenge/utils/bloc_localization.dart';
 import 'features/screen/HomePage_screen.dart';
+import 'package:sizer/sizer.dart';
 
 
 void main() async {
@@ -63,45 +64,54 @@ class _MyAppState extends State<MyApp> with AfterLayoutMixin<MyApp> {
       create:(_)=> BlocLocalization(),
       child: BlocBuilder<BlocLocalization, Locale>(
         builder:(context,locale){
-          return  MaterialApp(
-            locale: locale,
-            debugShowCheckedModeBanner: false,
-            supportedLocales: [Locale("en"), Locale("tr")],
-            localizationsDelegates: [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            theme: ThemeData(
-              visualDensity: VisualDensity.adaptivePlatformDensity,
-            ),
-            routes: {
-              "/": (context)=>initLanguage()
-            },
+          return  LayoutBuilder(
+            builder: (context,constraints){
+              return  OrientationBuilder(
+                  builder: (context,orientation){
+                    SizerUtil().init(constraints, orientation);
+                    return  MaterialApp(
+                    locale: locale,
+                    debugShowCheckedModeBanner: false,
+                    supportedLocales: [Locale("en"), Locale("tr")],
+                    localizationsDelegates: [
+                      GlobalMaterialLocalizations.delegate,
+                      GlobalWidgetsLocalizations.delegate,
+                      GlobalCupertinoLocalizations.delegate,
+                    ],
+                    theme: ThemeData(
+                      visualDensity: VisualDensity.adaptivePlatformDensity,
+                    ),
+                    routes: {
+                      "/": (context)=>initLanguage()
+                    },
 
-            onGenerateRoute:(settings){
-              switch(settings.name){
-                case "/login":
-                  return SlideLeftRoute(page: LoginScreen());
-                  break;
+                    onGenerateRoute:(settings){
+                      switch(settings.name){
+                        case "/login":
+                          return SlideLeftRoute(page: LoginScreen());
+                          break;
 
-                case "/home":
-                  return SlideLeftRoute(page: HomePage_Screen());
-                  break;
+                        case "/home":
+                          return SlideLeftRoute(page: HomePage_Screen());
+                          break;
 
-                case "/onboard_mission":
-                  return SlideLeftRoute(page: OnBoardingMissionPage());
-                  break;
-                case "/profil":
-                  return SlideLeftRoute(page: Profil_Screen());
-                  break;
-                case "/initial_language":
-                  return SlideLeftRoute(page: initLanguage());
-                  break;
-                default:
-                  return SlideLeftRoute(page: LoginScreen());
-                  break;
-              }
+                        case "/onboard_mission":
+                          return SlideLeftRoute(page: OnBoardingMissionPage());
+                          break;
+                        case "/profil":
+                          return SlideLeftRoute(page: Profil_Screen());
+                          break;
+                        case "/initial_language":
+                          return SlideLeftRoute(page: initLanguage());
+                          break;
+                        default:
+                          return SlideLeftRoute(page: initLanguage());
+                          break;
+                      }
+                    },
+                  );
+                },
+              );
             },
           );
         }

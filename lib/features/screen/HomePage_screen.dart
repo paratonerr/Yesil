@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:solution_challenge/domain/repository/remote_source.dart';
 import 'package:solution_challenge/features/provider/HomePage_provider.dart';
 import 'package:solution_challenge/features/widgets/HomePage_widget.dart';
+import 'package:sizer/sizer.dart';
+
 
 
 class HomePage_Screen extends StatefulWidget {
@@ -23,6 +26,7 @@ void afterFirstLayout(BuildContext context)async {
   await _homePageProvider.getParkList().then((value) {
     _homePageProvider.checkFilter();
   });
+
 
 }
 
@@ -47,7 +51,7 @@ void afterFirstLayout(BuildContext context)async {
 
         Visibility(
             visible: !_homePageProvider.isLoading,
-            child: HomePageWidget(homePageProvider: _homePageProvider,))]),
+            child: HomePageWidget(homePageProvider: _homePageProvider))]),
     );
   }
 

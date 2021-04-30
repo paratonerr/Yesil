@@ -10,7 +10,6 @@ class Remote{
   Future<List<Parks>> getParkList()async{
 
     List<Parks> parkList=List<Parks>();
-
     await query.get().then((querySnapshot) async {
 
       querySnapshot.docs.forEach((document) {
@@ -32,8 +31,6 @@ Future setRating(String parkname,var uid,double rating) async{
    await query2.set({
     'value': rating
   });
-
-
 }
 
 Future<double> getRating(String parkname)async {

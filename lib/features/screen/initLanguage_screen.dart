@@ -1,3 +1,4 @@
+import 'package:after_layout/after_layout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:solution_challenge/features/screen/account/login_screen.dart';
@@ -10,7 +11,7 @@ class initLanguage extends StatefulWidget {
   _initLanguageState createState() => _initLanguageState();
 }
 
-class _initLanguageState extends State<initLanguage> {
+class _initLanguageState extends State<initLanguage> with AfterLayoutMixin<initLanguage>{
   void initLanguage() async {
     final String language = await PrefUtils.getLanguage();
     BlocProvider.of<BlocLocalization>(context).add(
@@ -23,7 +24,6 @@ class _initLanguageState extends State<initLanguage> {
 
   @override
   void initState() {
-    initLanguage();
     // TODO: implement initState
     super.initState();
   }
@@ -32,5 +32,12 @@ class _initLanguageState extends State<initLanguage> {
     return Scaffold(
       body: Container(),
     );
+  }
+
+  @override
+  void afterFirstLayout(BuildContext context)async {
+    // TODO: implement afterFirstLayout
+    await initLanguage();
+
   }
 }

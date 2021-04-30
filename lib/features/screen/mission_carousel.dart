@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:sizer/sizer.dart';
 
 
 
@@ -53,8 +54,8 @@ class _OnBoardingMissionPageState extends State<OnBoardingMissionPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
-                height: 300,
-                width: 300,
+                height: 35.0.h,
+                width: 60.0.w,
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage("asset/walkingman.png")
@@ -62,13 +63,13 @@ class _OnBoardingMissionPageState extends State<OnBoardingMissionPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding:  EdgeInsets.all(1.0.w),
                 child: Text("In this mission, grab a trash bag and visit your nearest park",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),
               ),
               InkWell(
                 onTap:()=> Navigator.of(context).pop(),
                 child: Padding(
-                  padding: const EdgeInsets.only(top:30.0),
+                  padding:   EdgeInsets.only(top:3.0.h),
                   child: Container(
                     child: Center(child:Text("Complete Mission! ",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 20),)),
                     decoration: BoxDecoration(
@@ -76,8 +77,8 @@ class _OnBoardingMissionPageState extends State<OnBoardingMissionPage> {
                       color:Color(0xffffde6d),
 
                     ),
-                    height: 60,
-                    width: 200,
+                    height: 7.0.h,
+                    width: 50.0.w,
                   ),
                 ),
               )
@@ -92,8 +93,8 @@ class _OnBoardingMissionPageState extends State<OnBoardingMissionPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
-                height: 300,
-                width: 300,
+                height: 35.0.h,
+                width: 60.0.w,
                 decoration: BoxDecoration(
                     image: DecorationImage(
                         image: AssetImage("asset/coptoplama.png")
@@ -101,13 +102,13 @@ class _OnBoardingMissionPageState extends State<OnBoardingMissionPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding:  EdgeInsets.all(1.0.w),
                 child: Text("Look around for litter during your walk, and collect them on your bag if you see any!",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),
               ),
               InkWell(
                 onTap:()=> Navigator.of(context).pop(),
                 child: Padding(
-                  padding: const EdgeInsets.only(top:10.0),
+                  padding:   EdgeInsets.only(top:1.0.h),
                   child: Container(
                     child: Center(child:Text("Complete Mission! ",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 20),)),
                     decoration: BoxDecoration(
@@ -115,8 +116,8 @@ class _OnBoardingMissionPageState extends State<OnBoardingMissionPage> {
                       color:Color(0xFFffDE6D),
 
                     ),
-                    height: 60,
-                    width: 200,
+                    height: 7.0.h,
+                    width: 50.0.w,
                   ),
                 ),
               )
@@ -131,8 +132,8 @@ class _OnBoardingMissionPageState extends State<OnBoardingMissionPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
-                height: 300,
-                width: 300,
+                height: 35.0.h,
+                width: 60.0.w,
                 decoration: BoxDecoration(
                     image: DecorationImage(
                         image: AssetImage("asset/takephoto.png")
@@ -140,13 +141,13 @@ class _OnBoardingMissionPageState extends State<OnBoardingMissionPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding:  EdgeInsets.all(1.0.w),
                 child: Text(" Take a picture of your trash bag by pressing 'Complete mission' below, and claim your reward!",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),
               ),
               InkWell(
                 onTap:()=> Navigator.of(context).pop(),
                 child: Padding(
-                  padding: const EdgeInsets.only(top:10.0),
+                  padding:   EdgeInsets.only(top:2.0.h),
                   child: Container(
                     child: Center(child:Text("Complete Mission! ",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 20),)),
                     decoration: BoxDecoration(
@@ -154,8 +155,8 @@ class _OnBoardingMissionPageState extends State<OnBoardingMissionPage> {
                       color:Color(0xFffFDE6D),
 
                     ),
-                    height: 60,
-                    width: 200,
+                    height: 7.0.h,
+                    width: 50.0.w,
                   ),
                 ),
               )

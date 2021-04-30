@@ -5,10 +5,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:solution_challenge/domain/models/parks.dart';
 import 'package:solution_challenge/domain/repository/remote_source.dart';
 import 'package:solution_challenge/domain/repository/repo.dart';
 import 'package:solution_challenge/features/widgets/appexpansion.dart';
+import 'package:sizer/sizer.dart';
 import 'dart:ui' as ui;
 
 
@@ -22,6 +24,14 @@ abstract class HomePageProviderAbs{
 class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
   GoogleMapController _controller;
   PageController _pageController;
+  PanelController _panelController=PanelController() ;
+
+  PanelController get panelController => _panelController;
+
+  set panelController(PanelController value) {
+    _panelController = value;
+    notifyListeners();
+  }
 
   PageController get pageController => _pageController;
 
@@ -55,9 +65,14 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
 
   int _parkListPosition=0;
   int _preview;
+  double _draggablePadding=6.0.h;
 
 
+  double get draggablePadding => _draggablePadding;
 
+  set draggablePadding(double value) {
+    _draggablePadding = value;
+  }
 
   bool _isLoading=true;
   bool _spor=false;
@@ -68,6 +83,16 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
   bool _otopark=false;
   bool _oturmaalani=false;
   bool _expansionState=false;
+
+
+  bool get panelCheck => _panelCheck;
+
+  set panelCheck(bool value) {
+    _panelCheck = value;
+    notifyListeners();
+  }
+
+  bool _panelCheck=false;
 
   bool get expansionState => _expansionState;
 
@@ -123,6 +148,8 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
   List<Parks> get parkList => _parkList;
 
   int get preview => _preview;
+
+
 
 
   GoogleMapController get controller => _controller;
@@ -186,16 +213,21 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
       mapMarker=value;
     });
     _controller=controller;
-    parkList.forEach((element) async{
-        LatLng coords=LatLng(double.parse(element.coords1),double.parse(element.coords2));
-        markers.add(Marker(
-            icon: mapMarker,
-            markerId: MarkerId(element.title),
-            infoWindow: InfoWindow(title: element.title, snippet: element.description),
-            position:coords));
-
+    List.generate(parkList.length, (index) async{
+      LatLng coords=LatLng(double.parse(parkList[index].coords1),double.parse(parkList[index].coords2));
+      markers.add(Marker(
+          onTap: ()async {
+            moveCameraWithMarker(double.parse(parkList[index].coords1), double.parse(parkList[index].coords2));
+            parkListPosition=index;
+           await panelController.open();
+          },
+          icon: mapMarker,
+          markerId: MarkerId(parkList[index].title),
+          infoWindow: InfoWindow(title: parkList[index].title, snippet: parkList[index].description),
+          position:coords));
 
     });
+
     notifyListeners();
   }
 
@@ -203,6 +235,14 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
    controller.animateCamera(
         CameraUpdate.newCameraPosition(CameraPosition(
             target:LatLng(double.parse(parkList[pageController.page.toInt()].coords1),double.parse(parkList[pageController.page.toInt()].coords2)),
+            zoom: 14,bearing: 45,tilt: 45
+        )));
+  }
+
+  moveCameraWithMarker(cords1,cords2) {
+    controller.animateCamera(
+        CameraUpdate.newCameraPosition(CameraPosition(
+            target:LatLng(cords1,cords2),
             zoom: 14,bearing: 45,tilt: 45
         )));
   }
@@ -250,15 +290,16 @@ notifyListeners();
 
   }
 
+
+
+
   checkMenuVisibility(){
-    if(opacity>=0.8){
-      return false;
-    }else if(expansionState==true){
-      return false;
-    }
-    else{
+     if(panelCheck==true){
+       return false;
+    } else{
       return true;
     }
+    notifyListeners();
   }
 
   bool get engellidostu => _engellidostu;
@@ -301,6 +342,25 @@ notifyListeners();
   set oturmaalani(bool value) {
     _oturmaalani = value;
     notifyListeners();
+  }
+  checkFilter2() {
+    park.clear();
+
+    park.addAll(parkList.where((element) => element.otopark==otopark&&element.tuvalet==wc&&element.kultureloge==kultureloge&&element.engellidostu==engellidostu&&element.oturmaalani==oturmaalani&&element.yemeicme==yemek));
+
+    if(park.isNotEmpty){
+      park.addAll(parkList);
+
+    }
+
+    if(park.isEmpty){
+      park.addAll(parkList);
+    }
+
+    print(park.length);
+
+    notifyListeners();
+
   }
 
   checkFilter(){

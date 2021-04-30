@@ -8,6 +8,8 @@ import 'package:solution_challenge/utils/Routes.dart';
 import 'package:solution_challenge/utils/app_localizations.dart';
 import 'package:solution_challenge/utils/bloc_localization.dart';
 import 'package:solution_challenge/utils/prefLanguage.dart';
+import 'package:sizer/sizer.dart';
+
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -45,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
         children:[
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.only(top:10,right:16.0),
+              padding: const EdgeInsets.only(top:10.0 ,right:16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -68,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           Padding(
-          padding: const EdgeInsets.only(top:90.0),
+          padding:  EdgeInsets.only(top:20.0.h),
           child: Column(
             children: [
               Container(

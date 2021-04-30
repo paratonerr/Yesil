@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:solution_challenge/utils/Routes.dart';
 import 'package:solution_challenge/utils/app_localizations.dart';
+import 'package:sizer/sizer.dart';
 
 class Profil_Screen extends StatefulWidget {
   @override
@@ -46,21 +47,21 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
         showDialog(context: context, builder:(context){
           return AlertDialog(
             title: Container(
-              height: 200,
-              width: 200,
+              height: 30.0.h,
+              width: 30.0.w,
               decoration: BoxDecoration(
                   image: DecorationImage(image: AssetImage("asset/tebrikler.png"),fit: BoxFit.cover)
               ),
             ),
             content: Padding(
-              padding: const EdgeInsets.only(left:70.0),
+              padding:  EdgeInsets.only(left:25.0.w),
               child: Text("Nice Work!",style: TextStyle(fontWeight: FontWeight.w700,fontSize:19),),
             ),
 
             actions: [
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(left:16.0,right:8,bottom:20),
+                  padding:   EdgeInsets.only(left:6.0.w,right:1.0.w,bottom:20),
                   child: Text("We've added your rewars to your acount \n"
                       "After youe've finished gazing at your hardearned trophy \n"
                       "you can close this page by pressing done"
@@ -68,7 +69,7 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(right:30.0),
+                padding:   EdgeInsets.only(right:15.0.w),
                 child: InkWell(
                   onTap: (){
                     Navigator.pop(context);
@@ -94,21 +95,21 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
         showDialog(context: context, builder:(context){
           return AlertDialog(
             title: Container(
-              height: 200,
-              width: 200,
+              height: 30.0.h,
+              width: 30.0.w,
               decoration: BoxDecoration(
                   image: DecorationImage(image: AssetImage("asset/tebrikler.png"),fit: BoxFit.cover)
               ),
             ),
             content: Padding(
-              padding: const EdgeInsets.only(left:70.0),
+              padding:  EdgeInsets.only(left:25.0.w),
               child: Text("Nice Work!",style: TextStyle(fontWeight: FontWeight.w700,fontSize:19),),
             ),
 
             actions: [
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(left:16.0,right:8,bottom:20),
+                  padding:   EdgeInsets.only(left:6.0.w,right:1.0.w,bottom:20),
                   child: Text("We've added your rewars to your acount \n"
                       "After youe've finished gazing at your hardearned trophy \n"
                       "you can close this page by pressing done"
@@ -116,7 +117,7 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(right:30.0),
+                padding:   EdgeInsets.only(right:15.0.w),
                 child: InkWell(
                   onTap: (){
                     Navigator.pop(context);
@@ -142,21 +143,21 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
         showDialog(context: context, builder:(context){
           return AlertDialog(
             title: Container(
-              height: 200,
-              width: 200,
+              height: 30.0.h,
+              width: 30.0.w,
               decoration: BoxDecoration(
                   image: DecorationImage(image: AssetImage("asset/tebrikler.png"),fit: BoxFit.cover)
               ),
             ),
             content: Padding(
-              padding: const EdgeInsets.only(left:70.0),
+              padding:  EdgeInsets.only(left:25.0.w),
               child: Text("Nice Work!",style: TextStyle(fontWeight: FontWeight.w700,fontSize:19),),
             ),
 
             actions: [
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(left:16.0,right:8,bottom:20),
+                  padding:   EdgeInsets.only(left:6.0.w,right:1.0.w,bottom:20),
                   child: Text("We've added your rewars to your acount \n"
                       "After youe've finished gazing at your hardearned trophy \n"
                       "you can close this page by pressing done"
@@ -164,7 +165,7 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(right:30.0),
+                padding:   EdgeInsets.only(right:15.0.w),
                 child: InkWell(
                   onTap: (){
                     Navigator.pop(context);
@@ -190,21 +191,21 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
         showDialog(context: context, builder:(context){
           return AlertDialog(
             title: Container(
-              height: 200,
-              width: 200,
+              height: 30.0.h,
+              width: 30.0.w,
               decoration: BoxDecoration(
                   image: DecorationImage(image: AssetImage("asset/tebrikler.png"),fit: BoxFit.cover)
               ),
             ),
             content: Padding(
-              padding: const EdgeInsets.only(left:70.0),
+              padding:  EdgeInsets.only(left:25.0.w),
               child: Text("Nice Work!",style: TextStyle(fontWeight: FontWeight.w700,fontSize:19),),
             ),
 
             actions: [
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(left:16.0,right:8,bottom:20),
+                  padding:   EdgeInsets.only(left:6.0.w,right:1.0.w,bottom:20),
                   child: Text("We've added your rewars to your acount \n"
                       "After youe've finished gazing at your hardearned trophy \n"
                       "you can close this page by pressing done"
@@ -212,7 +213,7 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(right:30.0),
+                padding:   EdgeInsets.only(right:15.0.w),
                 child: InkWell(
                   onTap: (){
                     Navigator.pop(context);
@@ -238,21 +239,21 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
         showDialog(context: context, builder:(context){
           return AlertDialog(
             title: Container(
-              height: 200,
-              width: 200,
+              height: 30.0.h,
+              width: 30.0.w,
               decoration: BoxDecoration(
                   image: DecorationImage(image: AssetImage("asset/tebrikler.png"),fit: BoxFit.cover)
               ),
             ),
             content: Padding(
-              padding: const EdgeInsets.only(left:70.0),
+              padding:  EdgeInsets.only(left:25.0.w),
               child: Text("Nice Work!",style: TextStyle(fontWeight: FontWeight.w700,fontSize:19),),
             ),
 
             actions: [
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(left:16.0,right:8,bottom:20),
+                  padding:   EdgeInsets.only(left:6.0.w,right:1.0.w,bottom:20),
                   child: Text("We've added your rewars to your acount \n"
                       "After youe've finished gazing at your hardearned trophy \n"
                       "you can close this page by pressing done"
@@ -260,7 +261,7 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(right:30.0),
+                padding:   EdgeInsets.only(right:15.0.w),
                 child: InkWell(
                   onTap: (){
                     Navigator.pop(context);
@@ -351,82 +352,78 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                 width: MediaQuery.of(context).size.width,
                 child: Stack(
                   children: [
-                    Positioned(
-                        top:20,
-                        left: 10,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            InkWell(
-                                onTap:()async{
-                                  await showDialog(context: context,
-                                    builder: (context){
-                                    return  AlertDialog(
-                                        backgroundColor: Colors.transparent,
-                                        content: Container(
-                                          color: Colors.white,
-                                          height: 270,
-                                          width: 200,
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(bottom:150.0,left: 10,right: 10),
-                                                child: Text("Çıkış yapmak istediğinize emin misiniz?",style: TextStyle(fontWeight: FontWeight.w700),),
+                    Padding(
+                      padding:  EdgeInsets.only(top:4.0.w,left: 2.0.w,right: 2.0.w ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                              onTap:()async{
+                                await showDialog(context: context,
+                                  builder: (context){
+                                  return  AlertDialog(
+                                      backgroundColor: Colors.transparent,
+                                      content: Container(
+                                        color: Colors.white,
+                                        height: 270,
+                                        width: 200,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(bottom:150.0,left: 10,right: 10),
+                                              child: Text("Çıkış yapmak istediğinize emin misiniz?",style: TextStyle(fontWeight: FontWeight.w700),),
+                                            ),
+                                            InkWell(
+                                              onTap: ()async{
+                                                _googleSignIn.signOut().then((value) {
+
+                                                  Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.init_language, (route) => false);
+
+                                                });
+
+                                              },
+                                              child: Container(
+                                                child:Center(child: Text("ÇIKIŞ YAP",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700,fontSize: 20),)),
+                                                width: MediaQuery.of(context).size.width,
+                                                height: 60,
+                                                color: Colors.green.shade700,
                                               ),
-                                              InkWell(
-                                                onTap: ()async{
-                                                  _googleSignIn.signOut().then((value) {
-
-                                                    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.init_language, (route) => false);
-
-                                                  });
-
-                                                },
-                                                child: Container(
-                                                  child:Center(child: Text("ÇIKIŞ YAP",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700,fontSize: 20),)),
-                                                  width: MediaQuery.of(context).size.width,
-                                                  height: 60,
-                                                  color: Colors.green.shade700,
-                                                ),
-                                              )
-                                            ],
-                                          ),
+                                            )
+                                          ],
                                         ),
-                                      );
-                                    },
-                                  );
+                                      ),
+                                    );
                                   },
-                                child: Icon(Icons.login,size: 30,color: Colors.red.shade900,)),
-                            SizedBox(width: 50,),
-                            Text(_user.email,style: TextStyle(fontWeight: FontWeight.w700,fontSize: 20),),
-                            SizedBox(width: 30,),
-                            InkWell(
-                                onTap: (){
-                                  Navigator.of(context).pop();
+                                );
                                 },
-                                child: Icon(Icons.clear,size: 30,color: Colors.grey,))
-                          ],
-                        )),
-                    Positioned(
-                      left: 116,
-                        top:95,
+                              child: Icon(Icons.login,size: 30,color: Colors.red.shade900,)),
+                          Text(_user.email,style: TextStyle(fontWeight: FontWeight.w700,fontSize: 20),),
+                          InkWell(
+                              onTap: (){
+                                Navigator.of(context).pop();
+                              },
+                              child: Icon(Icons.clear,size: 20.0.sp,color: Colors.grey,))
+                        ],
+                      ),
+                    ),
+                    Align(
+                     alignment: Alignment.center,
                         child: Container(
-                            height: 130,
-                            width: 130,
+                            height: 17.0.h,
+                            width: 32.0.w,
                             child: Image.asset("asset/avatar_daire.png"))),
-                    Positioned(
-                      top:120,
-                      left: MediaQuery.of(context).size.width-219,
+                    Align(
+                      alignment: Alignment.center,
                       child: Container(
                         decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: NetworkImage(_user.photoURL),
+                              image: NetworkImage(_user.photoURL)
 
                             ),
-                            borderRadius: BorderRadius.circular(150)),
-                        height: 80,
-                        width: 80,
+                            borderRadius: BorderRadius.circular(100)),
+                        height: 10.8.h,
+                        width: 19.0.w,
                       ),
                     ),
                   ],
@@ -437,10 +434,10 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                   controller: tabController,
                   tabs: [
                     Container(
-                        height: 50,
+                        height: 6.0.h,
                         child: Center(child: Text(AppLocalizations.getString('profile'),style: TextStyle(color: Colors.black,fontWeight: FontWeight.w700,fontSize: 18),))),
                     Container(
-                        height: 50,
+                        height: 6.0.h,
                         child: Center(child: Text(AppLocalizations.getString('basarimlar'),style: TextStyle(color: Colors.black,fontWeight: FontWeight.w700,fontSize: 18),))),
                   ]),
                    Container(
@@ -454,23 +451,23 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Padding(padding: EdgeInsets.only(right: 13,top:40),
+                          Padding(padding: EdgeInsets.only(right: 7.0.w,top:5.0.h),
                           child: Text(AppLocalizations.getString('level'),style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w500),),
 
                           ),
                         ],
                       ),
-                      Padding(padding: EdgeInsets.only(left: 15,top:0),
+                      Padding(padding: EdgeInsets.only(left: 4.8.w,top:0),
                       child:Row(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(right:13),
+                            padding: const EdgeInsets.only(right:0),
                             child: Container(
-                                height: 60,
-                                width: 60,
+                                height: 10.0.h,
+                                width: 13.0.w,
                                 child: Image.asset("asset/profil_fidan.png")),
                           ),
-                          SizedBox(width: 24,),
+                          SizedBox(width: 8.0.w,),
                           Expanded(child: Container(
                             decoration: BoxDecoration(
                               boxShadow: [BoxShadow(color: Colors.black12,offset: Offset(2,2),blurRadius: 20)]
@@ -479,7 +476,7 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                               backgroundColor: Colors.white,
                               progressBarColor: Colors.green.shade600,
                               percentage: 0.2,
-                              width: 200,
+                              width: 63.0.w,
                               radius: 90,
                               lineHeight: 25,
                             ) ,
@@ -523,8 +520,8 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
 
                                  borderRadius: BorderRadius.circular(20)
                              ),
-                             height: 130,
-                             width: 150,
+                             height: 20.0.h,
+                             width: 43.0.w,
 
                            ),
                          ),
@@ -555,8 +552,8 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                                  boxShadow: [BoxShadow(color: Colors.black26,offset: Offset(2,2),blurRadius: 10)],
                                  borderRadius: BorderRadius.circular(20)
                              ),
-                             height: 130,
-                             width: 150,
+                             height: 20.0.h,
+                             width: 43.0.w,
 
                            ),
                          ),
@@ -581,7 +578,10 @@ class _Profil_ScreenState extends State<Profil_Screen>with TickerProviderStateMi
                           return InkWell(
                             onTap: (){
 
-                             Navigator.pushNamed(context, AppRoutes.onboard_mission).then((value) async{ await _loadAsset();});},
+                             Navigator.pushNamed(context, AppRoutes.onboard_mission).then((value) async{ await _loadAsset();});
+
+
+                             },
 
                             child: Padding(padding: EdgeInsets.all(10),
                             child:   Container(

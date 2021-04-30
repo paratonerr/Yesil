@@ -4,8 +4,10 @@ import 'dart:ui';
 import 'package:after_layout/after_layout.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sliding_up_panel/flutter_sliding_up_panel.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:solution_challenge/domain/models/parks.dart';
 import 'package:solution_challenge/domain/repository/remote_source.dart';
 import 'package:solution_challenge/features/provider/HomePage_provider.dart';
@@ -14,12 +16,14 @@ import 'package:solution_challenge/features/widgets/appexpansion.dart';
 import 'package:solution_challenge/utils/Routes.dart';
 import 'package:solution_challenge/utils/app_localizations.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:sizer/sizer.dart';
+
 
 
 class HomePageWidget extends StatefulWidget {
   final HomePageProvider homePageProvider;
 
-  HomePageWidget({this.homePageProvider});
+  HomePageWidget({this.homePageProvider}):super();
 
   @override
   _HomePageWidgetState createState() => _HomePageWidgetState();
@@ -37,7 +41,9 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
   bool expansionState;
 
 
+
   User user;
+
 
   @override
   void initState() {
@@ -53,22 +59,21 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
 
       _homePageProvider.scroll();
 
-      await _homePageProvider.getRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title);
+      await _homePageProvider.getRating(_homePageProvider.park[_homePageProvider.parkListPosition].title);
 
-      await _homePageProvider.getUserRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title,user.uid).then((value) {
+      await _homePageProvider.getUserRating(_homePageProvider.park[_homePageProvider.parkListPosition].title,user.uid).then((value) {
         print("user");
-
-
       });
     }
     );
+
+
 
     _homePageProvider.filter.add(AppLocalizations.getString('sit_field'));
     _homePageProvider.filter.add(AppLocalizations.getString('accessible'));
     _homePageProvider.filter.add(AppLocalizations.getString('eat'));
     _homePageProvider.filter.add(AppLocalizations.getString('wc'));
     _homePageProvider.filter.add(AppLocalizations.getString('culture'));
-    _homePageProvider.filter.add(AppLocalizations.getString('car_park'));
     _homePageProvider.filter.add(AppLocalizations.getString('car_park'));
 
 
@@ -106,7 +111,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top:15.0),
+                padding:  EdgeInsets.only(top:5.0.h,left: 5.0.w),
                 child: Visibility(
                     visible: _homePageProvider.checkMenuVisibility(),
                     child: Stack(
@@ -127,7 +132,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                             Navigator.pushNamed(context, AppRoutes.profil);
                           },
                           child: Padding(
-                            padding: const EdgeInsets.only(top:3,left:15.0,right: 0),
+                            padding:  EdgeInsets.only(top:0.6.h,left:4.0.w,right: 0),
                             child: Container(
                               child: Icon(Icons.person_rounded),
                               decoration: BoxDecoration(
@@ -146,130 +151,136 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                     )),
               ),
 
-              NotificationListener<DraggableScrollableNotification>(
-                onNotification: (value){
-                  setState(() {
-                    print(_homePageProvider.opacity);
-
-                  });
-                  _homePageProvider.opacity=value.extent;
-                  return  true;
-                },
+              Opacity(
+                opacity: _homePageProvider.checkMenuVisibility()==false?1:0.8,
                 child: Visibility(
                   visible: expansionState==true?false:true,
-                  child: Opacity(
-                    opacity: _homePageProvider.checkMenuVisibility()==false?1:0.8,
-                    child: DraggableScrollableSheet(
-                      initialChildSize: 0.35,
-                      minChildSize: 0.35,
-                      maxChildSize: 0.9,
-                      builder: (context,scrollCntrl){
+                   child:_homePageProvider.park[_homePageProvider.parkListPosition].photo!=null?
+                   SlidingUpPanel(
+                     borderRadius: BorderRadius.circular(30),
+                    onPanelOpened: (){
+                      _homePageProvider.panelCheck=true;
+                     },
+                    onPanelClosed: (){
+                      _homePageProvider.panelCheck=false;
 
-
-
-                        scrollCntrl.addListener(() {
-
-                        });
-                        return SingleChildScrollView(
-                            controller: scrollCntrl,
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(
-                                sigmaX: 5,
-                                sigmaY: 5
-                              ),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(30),
-                                      topRight: Radius.circular(30),
-                                    )
-                                ),
-                                height:1170,
-                                child:
-                                Column(
-                                  children: [
-                                    InkWell(
-                                      onTap: (){
-
-                                        if( _homePageProvider.detailvisiblity==true){
-                                          _homePageProvider.detailvisiblity=false;
-                                          _homePageProvider.opacity=0.6;
-                                        }
-                                        else{
-                                          _homePageProvider.opacity=1;
-                                          _homePageProvider.detailvisiblity=true;
-                                        }
-                                      },
-                                      child: Column(children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Container(
-                                            height: 3,
-                                            width: 60,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                        Text(AppLocalizations.getString('slide_detail'),style: TextStyle(color: Colors.grey),),
-                                        Visibility(
-                                          visible: !_homePageProvider.checkMenuVisibility(),
-                                          child: Column(children: [
-                                            detailInfo( _homePageProvider.parkListPosition),
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Divider(color: Colors.black45,indent: 30,endIndent: 30,),
-                                            ),
-                                            SingleChildScrollView(
-                                              child: Column(children: [
-                                                detailCard(title: AppLocalizations.getString('accessible'),icon: Icons.accessible,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].engellidostu),
-                                                SizedBox(height: 30,),
-                                                detailCard(title:  AppLocalizations.getString('sport_field'),icon: Icons.fitness_center,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].kosuPark),
-                                                SizedBox(height: 30,),
-                                                detailCard(title:  AppLocalizations.getString('eat'),icon: Icons.free_breakfast,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].yemeicme),
-                                                SizedBox(height: 30,),
-                                                detailCard(title:  AppLocalizations.getString('wc'),icon: Icons.wc,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].tuvalet),
-                                                SizedBox(height: 30,),
-                                                detailCard(title:  AppLocalizations.getString('culture'),icon: Icons.museum,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].kultureloge),
-                                                SizedBox(height: 30,),
-                                                detailCard(title:  AppLocalizations.getString('car_park'),icon: Icons.directions_car,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].otopark),
-                                                SizedBox(height: 30,),
-                                                detailCard(title:  AppLocalizations.getString('sit_field'),icon: Icons.airline_seat_recline_normal,enabled: _homePageProvider.parkList[_homePageProvider.parkListPosition].oturmaalani),
-                                              ],),
-                                            ),
-
-                                          ],),
-                                        ),
-
-
-
-                                      ],),
-
-                                    ),
-
-                                  ],
-                                ) ,
-
-
-                              ),
-                            )
-
-
-
-                        );
-                      },
+                    },
+                    controller:_homePageProvider.panelController ,
+                 minHeight: 33.0.h,
+                 maxHeight: 85.0.h,
+                    collapsed: Container(
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding:   EdgeInsets.only(top:2.0.h),
+                          child: Text('Ayrıntılar için yukarı kaydırınız',style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w500),),
+                        ),
+                      ),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(top:Radius.circular(30))
+                      ),
                     ),
-                  ),
+                    panelBuilder: (scrollCntrl){
+                      print(scrollCntrl.initialScrollOffset);
+                      return         _homePageProvider.park[_homePageProvider.parkListPosition].photo!=null?
+
+                      SingleChildScrollView(
+                          controller: scrollCntrl,
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(
+                              sigmaX: 5,
+                              sigmaY: 5
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(30),
+                                    topRight: Radius.circular(30),
+                                    bottomLeft: Radius.circular(30),
+                                    bottomRight: Radius.circular(30),
+                                  )
+                              ),
+                              height:1170,
+                              child:
+                              Column(
+                                children: [
+                                  InkWell(
+                                    onTap: (){
+
+                                      if( _homePageProvider.detailvisiblity==true){
+                                        _homePageProvider.detailvisiblity=false;
+                                        _homePageProvider.opacity=0.6;
+                                      }
+                                      else{
+                                        _homePageProvider.opacity=1;
+                                        _homePageProvider.detailvisiblity=true;
+                                      }
+                                    },
+                                    child: Column(children: [
+
+                                      Visibility(
+                                        visible: true,
+                                        child: Column(children: [
+                                          detailInfo( _homePageProvider.parkListPosition),
+                                          Padding(
+                                            padding:  EdgeInsets.all(8.0),
+                                            child: Divider(color: Colors.black45,indent: 30,endIndent: 30,),
+                                          ),
+                                          SingleChildScrollView(
+                                            child: Column(children: [
+                                              detailCard(title: AppLocalizations.getString('accessible'),icon: Icons.accessible,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].engellidostu),
+                                              SizedBox(height: 30,),
+                                              detailCard(title:  AppLocalizations.getString('sport_field'),icon: Icons.fitness_center,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].kosuPark),
+                                              SizedBox(height: 30,),
+                                              detailCard(title:  AppLocalizations.getString('eat'),icon: Icons.free_breakfast,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].yemeicme),
+                                              SizedBox(height: 30,),
+                                              detailCard(title:  AppLocalizations.getString('wc'),icon: Icons.wc,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].tuvalet),
+                                              SizedBox(height: 30,),
+                                              detailCard(title:  AppLocalizations.getString('culture'),icon: Icons.museum,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].kultureloge),
+                                              SizedBox(height: 30,),
+                                              detailCard(title:  AppLocalizations.getString('car_park'),icon: Icons.directions_car,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].otopark),
+                                              SizedBox(height: 30,),
+                                              detailCard(title:  AppLocalizations.getString('sit_field'),icon: Icons.airline_seat_recline_normal,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].oturmaalani),
+                                            ],),
+                                          ),
+
+                                        ],),
+                                      ),
+
+
+
+                                    ],),
+
+                                  ),
+
+                                ],
+                              ) ,
+
+
+                            ),
+                          ),
+
+
+
+
+                      ):Container();
+
+                    },
+                  ):Container()
                 ),
               ),
               Visibility(
                 visible: _homePageProvider.checkMenuVisibility(),
                 child: Positioned(
-                    bottom: 20,
+                    bottom: 2.0.h,
                     child: Container(
-                      height: 150,
+                      height: 39.0.w,
                       width: MediaQuery.of(context).size.width,
                       child: PageView.builder(
-                        itemCount:_homePageProvider.parkList.length-1,
+                        key: PageStorageKey('index'),
+                        itemCount:_homePageProvider.park.length,
                         itemBuilder: (context, position) {
 
 
@@ -332,8 +343,8 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
         }
         return Center(
           child: SizedBox(
-            height: Curves.easeInOut.transform(value) * 135.0,
-            width: Curves.easeInOut.transform(value) * 450.0,
+            height: Curves.easeInOut.transform(value) * 250.0.h,
+            width: Curves.easeInOut.transform(value) * 450.0.h,
             child: widget,
           ),
         );
@@ -343,13 +354,16 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
         onTap: () async{
          await _homePageProvider.moveCamera();
         },
-        child: Stack(
+        child:
+
+        _homePageProvider.park[_homePageProvider.parkListPosition].photo!=null?
+        Stack(
           children: [
             Center(
               child: Container(
                 margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-                height: 325.0,
-                width: 275.0,
+                height: 405.0.h,
+                width: 90.0.w,
 
                 child: Container(
                   decoration:
@@ -361,7 +375,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                     children: [
                       Icon(Icons.chevron_left,color: Colors.grey,),
                       Padding(
-                        padding: const EdgeInsets.all(10.0),
+                        padding:  EdgeInsets.all(3.0.w),
                         child: Container(
                           height: 90,
                           width: 90,
@@ -369,7 +383,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                               borderRadius: BorderRadius.circular(
                                  20),
                               image: DecorationImage(
-                                  image: NetworkImage(  _homePageProvider.parkList[_homePageProvider.parkListPosition].photo),
+                                  image: NetworkImage(  _homePageProvider.park[_homePageProvider.parkListPosition].photo),
                                   fit: BoxFit.cover)),
                         ),
                       ),
@@ -381,7 +395,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _homePageProvider.parkList[_homePageProvider.parkListPosition].title.toUpperCase(),
+                            _homePageProvider.park[_homePageProvider.parkListPosition].title.toUpperCase(),
                             style: TextStyle(
                                 fontSize:8.0, fontWeight: FontWeight.w500),
                           ),
@@ -397,7 +411,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                             children: [
                               Icon(Icons.location_on,size: 17,),
                               Text(
-                                _homePageProvider.parkList[_homePageProvider.parkListPosition].description.toUpperCase(),
+                                _homePageProvider.park[_homePageProvider.parkListPosition].description.toUpperCase(),
                                 style: TextStyle(
                                     fontSize:8.0, fontWeight: FontWeight.w500,color: Colors.grey),
                               ),
@@ -414,17 +428,45 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
               ),
             )
           ],
-        ),
+        ): Stack(
+          children: [
+            Center(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+                height: 405.0.h,
+                width: 90.0.w,
+
+                child: Container(
+                  decoration:
+                  BoxDecoration(
+                      boxShadow: [BoxShadow(color: Colors.black38,offset: Offset(-3,3),blurRadius: 20)],
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20.0)),
+                  child:Container(
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Gözcü modundan çıkmak için yana kaydırınız',style: TextStyle(color: Colors.grey),),
+                          Icon(Icons.chevron_right,color: Colors.grey,)
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            )
+          ],
+        )
       ),
     );
   }
-
   Widget filterBar(){
-    return       Padding(
-      padding: const EdgeInsets.only(left:80.0,right: 22),
+    return   Padding(
+      padding:  EdgeInsets.only(left:22.0.w,right: 5.0.w),
       child: Card(
-      shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(15.0)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0)),
         elevation: 20,
         child: Stack(
           children: [
@@ -432,7 +474,6 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
               onExpansionChanged: (value){
                 setState(() {
                   expansionState=value;
-
                 });
               },
               key: _homePageProvider.expansionTileList,
@@ -441,11 +482,10 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                 Container(
                     decoration: BoxDecoration(
                         color: Colors.white,
-
-                        borderRadius: BorderRadius.circular(20)
+                        borderRadius: BorderRadius.circular(20.0.sp)
                     ),
-                    height: 250,
-                    width: 250,
+                    height: 40.0.h,
+                    width: 250.0.w,
                     child:SingleChildScrollView(
                       child: Column(
                         children: [
@@ -454,7 +494,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.only(top:16.0,left:2),
-                                child: FilterButton(icon: Icons.airline_seat_recline_normal,index: 0,homePageProvider: _homePageProvider,select: _homePageProvider.spor,name1: _homePageProvider.filter[0],),
+                                child: FilterButton(icon: Icons.airline_seat_recline_normal,index: 0,homePageProvider: _homePageProvider,select: _homePageProvider.oturmaalani,name1: _homePageProvider.filter[0],),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left:5.0,top:16),
@@ -486,14 +526,6 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                               ),
                             ],
                           ),
-                          Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top:16.0,left:2),
-                                child: FilterButton(icon: Icons.airline_seat_recline_normal,select: _homePageProvider.oturmaalani,name1: _homePageProvider.filter[6],index: 6,homePageProvider: _homePageProvider,),
-                              ),
-                            ],
-                          ),
 
                         ],
                       ),
@@ -502,94 +534,93 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(top:10.0),
+              padding:  EdgeInsets.only(left: 4.0.w,right: 4.0.w,top:1.4.w,),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                 children: [
                   Stack(
                     children: [
+                      Text(AppLocalizations.getString('filter'),style: TextStyle(color:_homePageProvider.oturmaalani==true||_homePageProvider.otopark==true||_homePageProvider.kultureloge==true||_homePageProvider.yemek==true||_homePageProvider.wc==true||_homePageProvider.engellidostu==true||_homePageProvider.spor==true?Colors.white:Colors.grey),),
                       Padding(
-                        padding: const EdgeInsets.only(left:40.0,right: 80),
-                        child: Expanded(child: Text(AppLocalizations.getString('filter'),style: TextStyle(color:_homePageProvider.oturmaalani==true||_homePageProvider.otopark==true||_homePageProvider.kultureloge==true||_homePageProvider.yemek==true||_homePageProvider.wc==true||_homePageProvider.engellidostu==true||_homePageProvider.spor==true?Colors.white:Colors.grey),)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left:11.0,top:2),
+                        padding: const EdgeInsets.only(left:8.0,top:2),
                         child: Row(
                           children: [
-                          Visibility(
-                            visible: _homePageProvider.engellidostu,
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Icon(Icons.accessible,color:Color(0xff00524E)),
+                            Visibility(
+                              visible: _homePageProvider.engellidostu,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(Icons.accessible,color:Color(0xff00524E)),
+                              ),
                             ),
-                          ),
-                          Visibility(
-                            visible: _homePageProvider.spor,
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Icon(Icons.fitness_center,color:Color(0xff00524E)),
+                            Visibility(
+                              visible: _homePageProvider.spor,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(Icons.fitness_center,color:Color(0xff00524E)),
+                              ),
                             ),
-                          ),
-                          Visibility(
-                            visible: _homePageProvider.wc,
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Icon(Icons.wc,color:Color(0xff00524E)),
+                            Visibility(
+                              visible: _homePageProvider.wc,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(Icons.wc,color:Color(0xff00524E)),
+                              ),
                             ),
-                          ),
-                          Visibility(
-                            visible: _homePageProvider.yemek,
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Icon(Icons.free_breakfast,color:Color(0xff00524E)),
+                            Visibility(
+                              visible: _homePageProvider.yemek,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(Icons.free_breakfast,color:Color(0xff00524E)),
+                              ),
                             ),
-                          ),
-                          Visibility(
-                            visible: _homePageProvider.kultureloge,
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Icon(Icons.museum,color:Color(0xff00524E)),
+                            Visibility(
+                              visible: _homePageProvider.kultureloge,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(Icons.museum,color:Color(0xff00524E)),
+                              ),
                             ),
-                          ),
-                          Visibility(
-                            visible: _homePageProvider.otopark,
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Icon(Icons.directions_car,color:Color(0xff00524E)),
+                            Visibility(
+                              visible: _homePageProvider.otopark,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(Icons.directions_car,color:Color(0xff00524E)),
+                              ),
                             ),
-                          ),
-                          Visibility(
-                            visible: _homePageProvider.oturmaalani,
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Icon(Icons.airline_seat_recline_normal,color:Color(0xff00524E),),
+                            Visibility(
+                              visible: _homePageProvider.oturmaalani,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(Icons.airline_seat_recline_normal,color:Color(0xff00524E),),
+                              ),
                             ),
-                          ),
-                        ],),
+                          ],),
                       ),
                     ],
                   ),
-
-                  Container(height: 35,width: 1,color: Colors.grey.shade400,),
-                  Padding(
-                    padding: const EdgeInsets.only(left:15.0),
-                    child: Icon(Icons.filter_list,color: Color(0xff545857),),
-                  ),],
+                  Row(children: [
+                    Container(height: 5.0.h,width: 1,color: Colors.grey.shade400,),
+                    SizedBox(width: 2.0.w,),
+                    Icon(Icons.filter_list,color: Color(0xff545857),),
+                  ],)
+              ],
               ),
             ),
             Visibility(
               visible: expansionState==true?true:false,
               child: Padding(
-                padding: const EdgeInsets.only(top:310.0),
+                padding:  EdgeInsets.only(top:47.0.h),
                 child: InkWell(
                   onTap: (){
                     _homePageProvider.expansionTileList.currentState.collapse();
-                    _homePageProvider.checkFilter();
+                    _homePageProvider.checkFilter2();
 
                   },
                   child: Container(
-                    child: Center(child: Text("UYGULA",style: TextStyle(color: Colors.green.shade700,fontWeight: FontWeight.w700,fontSize: 18),)),
-                    width: 260,
-                    height: 45,
+                    child: Center(child: Text("UYGULA",style: TextStyle(color: Colors.green.shade700,fontWeight: FontWeight.w700,fontSize: 18.0.sp),)),
+                    width: 80.0.w,
+                    height: 7.0.h,
                     decoration: BoxDecoration(
                         color: Colors.transparent,
 
@@ -836,7 +867,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
     return Align(
       alignment: Alignment.centerRight,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding:  EdgeInsets.all(4.0.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -920,11 +951,11 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
         Align(
           alignment: Alignment.topLeft,
           child:   Padding(
-            padding: EdgeInsets.only(top:30),
+            padding: EdgeInsets.only(top:6.0.h),
             child: Container(
               decoration: BoxDecoration(
                   image: DecorationImage(
-                      image:NetworkImage(_homePageProvider.parkList[_homePageProvider.parkListPosition].photo),
+                      image:NetworkImage(_homePageProvider.park[_homePageProvider.parkListPosition].photo),
                       fit: BoxFit.cover
                   ),
                   borderRadius: BorderRadius.only(
@@ -932,79 +963,82 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                       bottomRight: Radius.circular(50)
                   )
               ),
-              height: 160,
-              width: 160,
+              height: 25.0.h,
+              width: 39.0.w,
             ),
           ),
         ),
-        SizedBox(width: 25,),
+        SizedBox(width: 1.0.w,),
         Expanded(
-          child: Column(
-            children: [
-              Text(_homePageProvider.parkList[_homePageProvider.parkListPosition].title,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w800),),
-              Padding(
-                padding: const EdgeInsets.only(left:0.0),
-                child:Column(
-                  children: [
+          child: Padding(
+            padding:  EdgeInsets.only(top:6.0.h),
+            child: Column(
+              children: [
+                Text(_homePageProvider.park[_homePageProvider.parkListPosition].title,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w800),),
+                Padding(
+                  padding:  EdgeInsets.only(left:0.0),
+                  child:Column(
+                    children: [
 
-                    GFRating(
-                      value: _homePageProvider.userRating,
-                      onChanged: (value)async{
-                        setState(() {
-                          _homePageProvider.userRating=value;
+                      GFRating(
+                        value: _homePageProvider.userRating,
+                        onChanged: (value)async{
+                          setState(() {
+                            _homePageProvider.userRating=value;
 
-                        });
-                          _homePageProvider.userRating=value;
+                          });
+                            _homePageProvider.userRating=value;
 
-                        await _homePageProvider.setRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title, user.uid, value).then((value) =>print("başarılı"));
+                          await _homePageProvider.setRating(_homePageProvider.park[_homePageProvider.parkListPosition].title, user.uid, value).then((value) =>print("başarılı"));
 
-                       await _homePageProvider.getRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title);
-                       await _homePageProvider.getUserRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title,user.uid);
-                        ratingValue= _homePageProvider.userRating;
+                         await _homePageProvider.getRating(_homePageProvider.park[_homePageProvider.parkListPosition].title);
+                         await _homePageProvider.getUserRating(_homePageProvider.park[_homePageProvider.parkListPosition].title,user.uid);
+                          ratingValue= _homePageProvider.userRating;
 
     },
-                      borderColor: Colors.orange,
-                      color: Colors.orange,
-                      size: 27,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("Park Puanı: "+_homePageProvider.ortRating.toString().trim(),style: TextStyle(color: Colors.grey),),
-                    )
-                  ],
-                )
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:40.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.location_on),
-                    Expanded(child: Text(_homePageProvider.parkList[_homePageProvider.parkListPosition].description,style: TextStyle(color: Colors.grey,fontSize: 12),))
-                  ],
+                        borderColor: Colors.orange,
+                        color: Colors.orange,
+                        size: 27,
+                      ),
+                      Padding(
+                        padding:  EdgeInsets.all(2.0.w),
+                        child: Text("Park Puanı: "+_homePageProvider.ortRating.toString().trim(),style: TextStyle(color: Colors.grey),),
+                      )
+                    ],
+                  )
                 ),
-              ),
-              SizedBox(height: 20,),
-              InkWell(
-                onTap: (){
-                  print(double.parse(_homePageProvider.parkList[_homePageProvider.parkListPosition].coords1));
-                  MapsLauncher.launchCoordinates(
-                  double.parse(_homePageProvider.parkList[_homePageProvider.parkListPosition].coords1),double.parse(_homePageProvider.parkList[_homePageProvider.parkListPosition].coords2),_homePageProvider.parkList[_homePageProvider.parkListPosition].title );
-
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(right:16.0),
-                  child: Container(
-                    child: Center(child: Text(AppLocalizations.getString('take_me_here'),style: TextStyle(color: Colors.white),)),
-                    decoration: BoxDecoration(
-                        color: Color(0xff00524E),
-                        borderRadius: BorderRadius.circular(10)
-                    ),
-                    height: 40,
-                    width: 140,
+                Padding(
+                  padding:  EdgeInsets.only(left:16.0.w),
+                  child: Row(
+                    children: [
+                      Icon(Icons.location_on),
+                      Expanded(child: Text(_homePageProvider.park[_homePageProvider.parkListPosition].description,style: TextStyle(color: Colors.grey,fontSize: 12),))
+                    ],
                   ),
                 ),
-              )
-            ],
+                SizedBox(height: 20,),
+                InkWell(
+                  onTap: (){
+                    print(double.parse(_homePageProvider.park[_homePageProvider.parkListPosition].coords1));
+                    MapsLauncher.launchCoordinates(
+                    double.parse(_homePageProvider.park[_homePageProvider.parkListPosition].coords1),double.parse(_homePageProvider.park[_homePageProvider.parkListPosition].coords2),_homePageProvider.park[_homePageProvider.parkListPosition].title );
+
+                  },
+                  child: Padding(
+                    padding:  EdgeInsets.only(right:1.0.h),
+                    child: Container(
+                      child: Center(child: Text(AppLocalizations.getString('take_me_here'),style: TextStyle(color: Colors.white),)),
+                      decoration: BoxDecoration(
+                          color: Color(0xff00524E),
+                          borderRadius: BorderRadius.circular(10)
+                      ),
+                      height: 40,
+                      width: 140,
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         )
 
@@ -1014,36 +1048,36 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
 
   Widget detailCard({String title, IconData icon,bool enabled}){
    return Padding(
-     padding: const EdgeInsets.only(left:23.0,right: 23.0),
+     padding:  EdgeInsets.only(left:5.0.w,right: 5.0.w),
      child: Container(
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
             boxShadow: [BoxShadow(color: Colors.black45,offset: Offset(-2,4),blurRadius: 10)]
         ),
-        height: 80,
-        width: 410,
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Icon(icon,color: enabled==false?Colors.grey: Color(0xff00524E),size: 40,),
-              Text(title,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500,color: enabled==false?Colors.grey: Color(0xff00524E)),),
-              Padding(
-                padding: const EdgeInsets.only(bottom:40.0,left: 40),
-                child: Container(
-                  child: Icon(Icons.info_outline,color: Colors.white,),
-                  decoration: BoxDecoration(
-                    color: Colors.amber,
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  height: 24,
-                  width: 24,
+        height: 10.0.h,
+        width: 410.0.w,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            SizedBox(width: 4.0.w,),
+            Icon(icon,color: enabled==false?Colors.grey: Color(0xff00524E),size: 26.0.sp,),
+            SizedBox(width: 4.0.w,),
+            Expanded(child: Text(title,style: TextStyle(fontSize: 15.0.sp,fontWeight: FontWeight.w500,color: enabled==false?Colors.grey: Color(0xff00524E)),)),
+            Padding(
+              padding:  EdgeInsets.only(bottom:5.0.h,left: 10.0.w,right: 5.0.w),
+              child: Container(
+                child: Icon(Icons.info_outline,color: Colors.white,),
+                decoration: BoxDecoration(
+                  color: Colors.amber,
+                  borderRadius: BorderRadius.circular(40),
                 ),
-              )
+                height: 24,
+                width: 24,
+              ),
+            )
 
-            ],),
-        ),
+          ],),
 
       ),
    );
@@ -1053,9 +1087,8 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
   void afterFirstLayout(BuildContext context) async{
     // TODO: implement afterFirstLayout
 
-    await _homePageProvider.getRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title);
-    await  _homePageProvider.getUserRating(_homePageProvider.parkList[_homePageProvider.parkListPosition].title,user.uid);
-
+    await _homePageProvider.getRating(_homePageProvider.park[_homePageProvider.parkListPosition].title);
+    await  _homePageProvider.getUserRating(_homePageProvider.park[_homePageProvider.parkListPosition].title,user.uid);
 
 
   }
@@ -1086,7 +1119,7 @@ class _FilterButtonState extends State<FilterButton> {
       onTap: (){
         switch(widget.index){
           case 0:
-            widget.homePageProvider.spor==false?widget.homePageProvider.spor=true:widget.homePageProvider.spor=false;
+            widget.homePageProvider.oturmaalani==false?widget.homePageProvider.oturmaalani=true:widget.homePageProvider.oturmaalani=false;
             break;
           case 1:
             widget.homePageProvider.engellidostu==false?widget.homePageProvider.engellidostu=true:widget.homePageProvider.engellidostu=false;
@@ -1103,9 +1136,7 @@ class _FilterButtonState extends State<FilterButton> {
           case 5:
             widget.homePageProvider.otopark==false?widget.homePageProvider.otopark=true:widget.homePageProvider.otopark=false;
             break;
-          case 6:
-            widget.homePageProvider.oturmaalani==false?widget.homePageProvider.oturmaalani=true:widget.homePageProvider.oturmaalani=false;
-            break;
+
         }
 
 
@@ -1139,3 +1170,5 @@ class _FilterButtonState extends State<FilterButton> {
     );
   }
 }
+
+

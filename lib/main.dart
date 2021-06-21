@@ -7,6 +7,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:redux/redux.dart';
 import 'package:solution_challenge/features/provider/HomePage_provider.dart';
+import 'package:solution_challenge/features/provider/profile_provider.dart';
 import 'package:solution_challenge/features/screen/HomePage_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:solution_challenge/features/screen/account/login_screen.dart';
@@ -22,13 +23,20 @@ import 'package:sizer/sizer.dart';
 
 
 void main() async {
+
+
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+      statusBarColor: Colors.green, // this one for android
+      statusBarBrightness: Brightness.light// this one for iOS
+  ));
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
 
   runApp(
       MultiProvider(providers: [
-        ChangeNotifierProvider(create: (BuildContext context)=>HomePageProvider())
+        ChangeNotifierProvider(create: (BuildContext context)=>HomePageProvider()),
+        ChangeNotifierProvider(create: (BuildContext context)=>Profile_Provider())
       ],
       child: MyApp() ,
       )
@@ -51,6 +59,8 @@ class _MyAppState extends State<MyApp> with AfterLayoutMixin<MyApp> {
 
   @override
   void afterFirstLayout(BuildContext context) async{
+    
+
   }
   @override
   void initState() {
@@ -60,6 +70,7 @@ class _MyAppState extends State<MyApp> with AfterLayoutMixin<MyApp> {
   }
   @override
   Widget build(BuildContext context) {
+
     return BlocProvider<BlocLocalization>(
       create:(_)=> BlocLocalization(),
       child: BlocBuilder<BlocLocalization, Locale>(
@@ -78,6 +89,7 @@ class _MyAppState extends State<MyApp> with AfterLayoutMixin<MyApp> {
                       GlobalWidgetsLocalizations.delegate,
                       GlobalCupertinoLocalizations.delegate,
                     ],
+
                     theme: ThemeData(
                       visualDensity: VisualDensity.adaptivePlatformDensity,
                     ),
@@ -96,7 +108,7 @@ class _MyAppState extends State<MyApp> with AfterLayoutMixin<MyApp> {
                           break;
 
                         case "/onboard_mission":
-                          return SlideLeftRoute(page: OnBoardingMissionPage());
+                          return SlideLeftRoute(page: OnBoardingMissionPage(onboard_arguments: settings.arguments,));
                           break;
                         case "/profil":
                           return SlideLeftRoute(page: Profil_Screen());

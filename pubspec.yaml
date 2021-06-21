@@ -38,6 +38,7 @@ dependencies:
   firebase_auth: 0.20.0
   filter_list: ^0.0.6
   redux: ^3.0.0
+  firebase_analytics: ^7.0.1
   flutter_redux: ^0.5.2
   getwidget: ^1.1.0
   flutter_sliding_up_panel: ^1.2.1
@@ -49,8 +50,8 @@ dependencies:
   maps_launcher: 1.0.1
   firebase_ml_vision: 0.10.0
   image_picker: ^0.6.3+4
-
-
+  permission_handler: 5.1.0+2
+  flutter_background_geolocation: ^1.9.0
 
 
 
@@ -70,6 +71,14 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.8.0"
+
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "asset/yesil_icon.png"
+
 
 
 # For information on the generic Dart part of this file, see the

@@ -4,6 +4,11 @@ import 'package:solution_challenge/domain/repository/remote_source.dart';
 abstract class ProductRepositoryAbs{
 Future getParkList();
 Future setRating(String parkname,var uid,double rating);
+Future<double> getRating(String parkname);
+Future<double> getUserRating(String parkname,var uid);
+Future setActiviy(idenfitier,state);
+
+
 }
 
 class ProductRepository implements ProductRepositoryAbs{
@@ -13,6 +18,7 @@ class ProductRepository implements ProductRepositoryAbs{
   Future<List<Parks>> getParkList() async{
    try{
   List<Parks> parkList=await _remote.getParkList();
+
 
   return parkList;
 
@@ -56,6 +62,12 @@ class ProductRepository implements ProductRepositoryAbs{
 
     }
   }
+
+  @override
+  Future setActiviy(idenfitier,state) async{
+    await _remote.setActiviy(idenfitier, state);
+  }
+
 
 
 

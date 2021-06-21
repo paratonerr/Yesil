@@ -12,6 +12,7 @@ import 'package:solution_challenge/domain/repository/repo.dart';
 import 'package:solution_challenge/features/widgets/appexpansion.dart';
 import 'package:sizer/sizer.dart';
 import 'dart:ui' as ui;
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 
 
 abstract class HomePageProviderAbs{
@@ -25,6 +26,14 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
   GoogleMapController _controller;
   PageController _pageController;
   PanelController _panelController=PanelController() ;
+  bg.Location _nowLocation;
+
+  bg.Location get nowLocation => _nowLocation;
+
+  set nowLocation(bg.Location value) {
+    _nowLocation = value;
+    notifyListeners();
+  }
 
   PanelController get panelController => _panelController;
 
@@ -74,6 +83,15 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
     _draggablePadding = value;
   }
 
+  bool _isLocationState=false;
+
+  bool get isLocationState => _isLocationState;
+
+  set isLocationState(bool value) {
+    _isLocationState = value;
+    notifyListeners();
+  }
+
   bool _isLoading=true;
   bool _spor=false;
   bool _engellidostu=false;
@@ -82,6 +100,19 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
   bool _kultureloge=false;
   bool _otopark=false;
   bool _oturmaalani=false;
+  bool _basketboll=false;
+
+  bool get basketboll => _basketboll;
+
+  set basketboll(bool value) {
+    _basketboll = value;
+    notifyListeners();
+  }
+
+  bool _sports_fields=false;
+  bool _bicycle_path=false;
+  bool _running_track=false;
+  bool _wifi=false;
   bool _expansionState=false;
 
 
@@ -154,6 +185,47 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
 
   GoogleMapController get controller => _controller;
 
+  bool get engellidostu => _engellidostu;
+
+  set engellidostu(bool value) {
+    _engellidostu = value;
+    notifyListeners();
+  }
+
+  bool get yemek => _yemek;
+
+  set yemek(bool value) {
+    _yemek = value;
+    notifyListeners();
+  }
+
+  bool get wc => _wc;
+
+  set wc(bool value) {
+    _wc = value;
+    notifyListeners();
+  }
+
+  bool get kultureloge => _kultureloge;
+
+  set kultureloge(bool value) {
+    _kultureloge = value;
+    notifyListeners();
+  }
+
+  bool get otopark => _otopark;
+
+  set otopark(bool value) {
+    _otopark = value;
+    notifyListeners();
+  }
+
+  bool get oturmaalani => _oturmaalani;
+
+  set oturmaalani(bool value) {
+    _oturmaalani = value;
+    notifyListeners();
+  }
 
   set controller(GoogleMapController value) {
     _controller = value;
@@ -207,6 +279,13 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
     notifyListeners();
   }
 
+ Future setActivity(idenfitier,state){
+    _productRepository.setActiviy(idenfitier, state);
+    notifyListeners();
+
+
+  }
+
   onMapCreated(controller)async{
     BitmapDescriptor  mapMarker;
       await BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(40, 40,),devicePixelRatio: 10), "asset/markeragac.png").then((value) {
@@ -216,27 +295,30 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
     List.generate(parkList.length, (index) async{
       LatLng coords=LatLng(double.parse(parkList[index].coords1),double.parse(parkList[index].coords2));
       markers.add(Marker(
-          onTap: ()async {
-            moveCameraWithMarker(double.parse(parkList[index].coords1), double.parse(parkList[index].coords2));
-            parkListPosition=index;
-           await panelController.open();
-          },
+
           icon: mapMarker,
           markerId: MarkerId(parkList[index].title),
-          infoWindow: InfoWindow(title: parkList[index].title, snippet: parkList[index].description),
+          infoWindow: InfoWindow(onTap: ()async{
+            await panelController.open();
+
+          },title: parkList[index].title, snippet: parkList[index].description),
           position:coords));
 
     });
 
-    notifyListeners();
+
+
+
+        notifyListeners();
   }
 
-  moveCamera() {
+  moveCamera()async {
    controller.animateCamera(
         CameraUpdate.newCameraPosition(CameraPosition(
             target:LatLng(double.parse(parkList[pageController.page.toInt()].coords1),double.parse(parkList[pageController.page.toInt()].coords2)),
             zoom: 14,bearing: 45,tilt: 45
         )));
+
   }
 
   moveCameraWithMarker(cords1,cords2) {
@@ -249,6 +331,7 @@ class HomePageProvider with ChangeNotifier implements HomePageProviderAbs{
 
  Future getParkList()async{
     await _productRepository.getParkList().then((value) {
+      print('parklist sonuç : '+value.toString());
     park=value;
     isLoading=false;
 
@@ -281,17 +364,16 @@ notifyListeners();
   }
 
 
-  scroll(){
+  scroll()async{
     if(pageController.page.toInt()!=preview){
       preview=pageController.page.toInt();
       moveCamera();
+      await controller.showMarkerInfoWindow(MarkerId(parkList[pageController.page.toInt()].title));
+
       notifyListeners();
     }
 
   }
-
-
-
 
   checkMenuVisibility(){
      if(panelCheck==true){
@@ -302,48 +384,12 @@ notifyListeners();
     notifyListeners();
   }
 
-  bool get engellidostu => _engellidostu;
+  checkFilter3() {
+    Set<Map> filters =Set<Map>();
 
-  set engellidostu(bool value) {
-    _engellidostu = value;
-    notifyListeners();
-  }
 
-  bool get yemek => _yemek;
 
-  set yemek(bool value) {
-    _yemek = value;
-    notifyListeners();
-  }
 
-  bool get wc => _wc;
-
-  set wc(bool value) {
-    _wc = value;
-    notifyListeners();
-  }
-
-  bool get kultureloge => _kultureloge;
-
-  set kultureloge(bool value) {
-    _kultureloge = value;
-    notifyListeners();
-  }
-
-  bool get otopark => _otopark;
-
-  set otopark(bool value) {
-    _otopark = value;
-    notifyListeners();
-  }
-
-  bool get oturmaalani => _oturmaalani;
-
-  set oturmaalani(bool value) {
-    _oturmaalani = value;
-    notifyListeners();
-  }
-  checkFilter2() {
     park.clear();
 
     park.addAll(parkList.where((element) => element.otopark==otopark&&element.tuvalet==wc&&element.kultureloge==kultureloge&&element.engellidostu==engellidostu&&element.oturmaalani==oturmaalani&&element.yemeicme==yemek));
@@ -363,13 +409,42 @@ notifyListeners();
 
   }
 
+  checkFilter2() {
+    park.clear();
+
+    park.addAll(parkList.where((element) {
+    return otopark==true? element.otopark == otopark :true&& wc==true? element.tuvalet == wc:true &&
+        kultureloge==true?  element.kultureloge == kultureloge :true&&
+         engellidostu==true? element.engellidostu == engellidostu :true&&
+         oturmaalani==true? element.oturmaalani == oturmaalani :true&& yemek==true?element.yemeicme == yemek:true&&
+        yemek==true?element.basketbol == basketboll:true&&sports_fields==true?element.sporalani == sports_fields:true&&
+        bicycle_path==true?element.bisikletyolu == bicycle_path:true
+        &&running_track==true?element.kosuparkuru == running_track:true&&wifi==true?element.wifi == wifi:true;
+    }));
+
+    if(park.isNotEmpty){
+      park.addAll(parkList);
+
+    }
+
+    if(park.isEmpty){
+      park.addAll(parkList);
+    }
+
+    print(park.length);
+
+    notifyListeners();
+
+  }
+
   checkFilter(){
     parkList.clear();
     ///eğer tüm koşullar true ise
-if(otopark==true||oturmaalani==true||engellidostu==true||kultureloge==true||spor==true||wc==true||yemek==true){
+
+ if(otopark==true||oturmaalani==true||engellidostu==true||kultureloge==true||spor==true||wc==true||yemek==true){
   if(otopark==true){
     List.generate(park.length, (index) {
-      if(park[index].kosuPark==true){
+      if(park[index].sporalani==true){
         parkList.add(park[index]);
         notifyListeners();
       }
@@ -397,7 +472,7 @@ if(otopark==true||oturmaalani==true||engellidostu==true||kultureloge==true||spor
     });
   }if(spor==true){
     List.generate(park.length, (index) {
-      if(park[index].kosuPark==true){
+      if(park[index].sporalani==true){
         parkList.add(park[index]);
         notifyListeners();
       }
@@ -426,5 +501,42 @@ if(otopark==true||oturmaalani==true||engellidostu==true||kultureloge==true||spor
 
 
     notifyListeners();
+  }
+
+  bool get sports_fields => _sports_fields;
+
+  set sports_fields(bool value) {
+    _sports_fields = value;
+    notifyListeners();
+
+  }
+
+  bool get bicycle_path => _bicycle_path;
+
+  set bicycle_path(bool value) {
+    _bicycle_path = value;
+    notifyListeners();
+
+  }
+
+  bool get running_track => _running_track;
+
+  set running_track(bool value) {
+    _running_track = value;
+    notifyListeners();
+
+  }
+
+  bool get wifi => _wifi;
+
+  set wifi(bool value) {
+    _wifi = value;
+    notifyListeners();
+  }
+
+  ProductRepository get productRepository => _productRepository;
+
+  set productRepository(ProductRepository value) {
+    _productRepository = value;
   }
 }

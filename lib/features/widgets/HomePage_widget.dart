@@ -17,7 +17,9 @@ import 'package:solution_challenge/utils/Routes.dart';
 import 'package:solution_challenge/utils/app_localizations.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:sizer/sizer.dart';
-
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 
 
 class HomePageWidget extends StatefulWidget {
@@ -39,6 +41,21 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
   FirebaseAuth _auth =FirebaseAuth.instance;
   double ratingValue;
   bool expansionState;
+  bool userState;
+  GoogleSignIn _googleSignIn=GoogleSignIn();
+
+
+  Future signIn()async{
+
+
+    GoogleSignInAccount googleUser=await _googleSignIn.signIn();
+    GoogleSignInAuthentication googleAuth =await googleUser.authentication;
+
+    AuthCredential credential =GoogleAuthProvider.credential(idToken: googleAuth.idToken,accessToken: googleAuth.accessToken);
+
+    await _auth.signInWithCredential(credential);
+  }
+
 
 
 
@@ -48,8 +65,8 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
   @override
   void initState() {
     // TODO: implement initState
-    user= _auth.currentUser;
     expansionState=false;
+
 
 
     ///initail variable
@@ -60,10 +77,13 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
       _homePageProvider.scroll();
 
       await _homePageProvider.getRating(_homePageProvider.park[_homePageProvider.parkListPosition].title);
-
+/*
       await _homePageProvider.getUserRating(_homePageProvider.park[_homePageProvider.parkListPosition].title,user.uid).then((value) {
         print("user");
       });
+
+ */
+
     }
     );
 
@@ -75,6 +95,92 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
     _homePageProvider.filter.add(AppLocalizations.getString('wc'));
     _homePageProvider.filter.add(AppLocalizations.getString('culture'));
     _homePageProvider.filter.add(AppLocalizations.getString('car_park'));
+    _homePageProvider.filter.add(AppLocalizations.getString('basketball'));
+    _homePageProvider.filter.add(AppLocalizations.getString('sports_field'));
+    _homePageProvider.filter.add(AppLocalizations.getString('bicycle_path'));
+    _homePageProvider.filter.add(AppLocalizations.getString('running_track'));
+    _homePageProvider.filter.add(AppLocalizations.getString('wifi'));
+
+
+
+
+
+
+
+
+    bg.BackgroundGeolocation.addGeofences(List.generate(_homePageProvider.park.length, (index)
+    {
+
+    return  bg.Geofence(
+          identifier: _homePageProvider.park[index].title,
+          radius: 700,
+          latitude: double.parse(_homePageProvider.park[index].coords1),
+          longitude: double.parse(_homePageProvider.park[index].coords2),
+          notifyOnExit: true,
+          notifyOnEntry: true
+      );
+
+
+    })).then((bool success) {
+      print('[addGeofences] success');
+    }).catchError((dynamic error) => {
+      print('[addGeofences] FAILURE: $error')
+    });
+
+    // Fired whenever a location is recorded
+    bg.BackgroundGeolocation.onLocation((bg.Location location) {
+      print('[gelen location]1234  $location');
+    });
+
+    // Fired whenever the plugin changes motion-state (stationary->moving and vice-versa)
+    bg.BackgroundGeolocation.onMotionChange((bg.Location location) {
+      print('[motionchange] - $location');
+    });
+
+    // Fired whenever the state of location-services changes.  Always fired at boot
+    bg.BackgroundGeolocation.onProviderChange((bg.ProviderChangeEvent event) {
+      print('[providerchange] - $event');
+    });
+
+
+    ////
+    // 2.  Configure the plugin
+    //
+    bg.BackgroundGeolocation.ready(bg.Config(
+        desiredAccuracy: bg.Config.DESIRED_ACCURACY_NAVIGATION,
+
+        distanceFilter: 10.0,
+        stopOnTerminate: false,
+        isMoving: true,
+        autoSync: true,
+        forceReloadOnMotionChange: true,
+
+        backgroundPermissionRationale: bg.PermissionRationale(
+            title: "Allow {applicationName} to access this device's location even when the app is closed or not in use.",
+            message: "This app collects location data to enable recording your trips to work and calculate distance-travelled.",
+            positiveAction: 'Change to "{backgroundPermissionOptionLabel}"',
+            negativeAction: 'Cancel'
+        ),
+
+        startOnBoot: true,
+        debug: true,
+        logLevel: bg.Config.LOG_LEVEL_VERBOSE
+    )).then((bg.State state) {
+      if (!state.enabled) {
+        ////
+        // 3.  Start the plugin.
+        //
+        bg.BackgroundGeolocation.start();
+
+      }
+    });
+
+
+
+    bg.BackgroundGeolocation.onGeofence((z) async{
+     await _homePageProvider.setActivity(z.identifier, z.action);
+     print(z.identifier+'  gelen geofence  '+z.action+" : geofence actions");
+    });
 
 
 
@@ -89,245 +195,307 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
     var height=MediaQuery.of(context).size.height;
     var width=MediaQuery.of(context).size.width;
 
-    return SafeArea(
-      child: Stack(
-        children: [
-          Visibility(visible:_homePageProvider.isLoading,child: Center(child: CircularProgressIndicator(backgroundColor:Color(0xff00524E) ,))),
+    return Stack(
+      children: [
+        Visibility(visible:_homePageProvider.isLoading,child: Center(child: CircularProgressIndicator(backgroundColor:Color(0xff00524E) ,))),
 
-          Visibility(
-            visible: !_homePageProvider.isLoading,
-            child: Stack(children: [
-              Container(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                child: GoogleMap(
-                  myLocationButtonEnabled: true,
-                  myLocationEnabled: true,
-                  mapToolbarEnabled: false,
-                  zoomControlsEnabled: false,
-                  markers: Set.from(_homePageProvider.markers),
-                  onMapCreated: _homePageProvider.onMapCreated,
-                  initialCameraPosition: CameraPosition(target: LatLng(41.060701, 29.037435 ),zoom: 12),
-                ),
+        Visibility(
+          visible: !_homePageProvider.isLoading,
+          child: Stack(children: [
+            Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: GoogleMap(
+                trafficEnabled: true,
+
+                myLocationEnabled: true,
+                myLocationButtonEnabled: false,
+                 mapToolbarEnabled: false,
+                zoomControlsEnabled: false,
+                markers: Set.from(_homePageProvider.markers),
+                onMapCreated: _homePageProvider.onMapCreated,
+                initialCameraPosition: CameraPosition(target: LatLng( 41.060701, 29.037435 ),zoom: 12),
               ),
-              Padding(
-                padding:  EdgeInsets.only(top:5.0.h,left: 5.0.w),
-                child: Visibility(
-                    visible: _homePageProvider.checkMenuVisibility(),
-                    child: Stack(
-                      children: [
-                        InkWell(
-                            onTap: (){
-                              if(_homePageProvider.expansionState==false){
-                                _homePageProvider.expansionTileList.currentState.expand();
-                              }else{
-                                _homePageProvider.expansionTileList.currentState.collapse();
-
-                              }
-                            },
-                            child: filterBar()),
-
-                        InkWell(
+            ),
+            Padding(
+              padding:  EdgeInsets.only(top:6.5.h,left: 2.0.w),
+              child: Visibility(
+                  visible: _homePageProvider.checkMenuVisibility(),
+                  child: Stack(
+                    children: [
+                      InkWell(
                           onTap: (){
-                            Navigator.pushNamed(context, AppRoutes.profil);
-                          },
-                          child: Padding(
-                            padding:  EdgeInsets.only(top:0.6.h,left:4.0.w,right: 0),
-                            child: Container(
-                              child: Icon(Icons.person_rounded),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  boxShadow: [BoxShadow(offset: Offset(2,2),color: Colors.black26,blurRadius: 20)],
-                                  borderRadius: BorderRadius.circular(50)
+                            if(_homePageProvider.expansionState==false){
+                              _homePageProvider.expansionTileList.currentState.expand();
+                            }else{
+                              _homePageProvider.expansionTileList.currentState.collapse();
 
+                            }
+                          },
+                          child: filterBar()),
+
+                      InkWell(
+                        onTap: (){
+                          if(userState==false){
+                            showDialog(context: context,
+                            child: AlertDialog(
+                              backgroundColor: Colors.transparent,
+                              content: Container(
+                                color: Colors.white,
+                                height: 270,
+                                width: 200,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom:150.0,left: 10,right: 10),
+                                      child: Text("Lütfen önce giriş yapınız.",style: TextStyle(fontWeight: FontWeight.w700),),
+                                    ),
+                                    InkWell(
+                                      onTap: ()async{
+                                        signIn().then((value) => Navigator.of(context).pop());
+
+                                      },
+                                      child: Container(
+                                        child:Center(child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Container(
+                                                height: 30,
+                                                width: 30,
+                                                child: Image.asset("asset/google_icon.png")),
+
+                                            Text("GİRİŞ YAP",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700,fontSize: 20),),
+                                          ],
+                                        )),
+                                        width: MediaQuery.of(context).size.width,
+                                        height: 60,
+                                        color: Colors.green.shade700,
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
-                              width: 60,
-                              height: 60,
+                            )
+                            );
+                          }else{
+
+                            Navigator.pushNamed(context, AppRoutes.profil);
+
+
+                          }
+
+
+                        },
+                        child: Padding(
+                          padding:  EdgeInsets.only(top:0.6.h,left:4.0.w,right: 0),
+                          child: Container(
+                            child: Icon(Icons.person_rounded),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                boxShadow: [BoxShadow(offset: Offset(2,2),color: Colors.black26,blurRadius: 20)],
+                                borderRadius: BorderRadius.circular(50)
+
                             ),
+                            width: 17.0.w,
+                            height: 17.0.w,
                           ),
                         ),
-
-                      ],
-                    )),
-              ),
-
-              Opacity(
-                opacity: _homePageProvider.checkMenuVisibility()==false?1:0.8,
-                child: Visibility(
-                  visible: expansionState==true?false:true,
-                   child:_homePageProvider.park[_homePageProvider.parkListPosition].photo!=null?
-                   SlidingUpPanel(
-                     borderRadius: BorderRadius.circular(30),
-                    onPanelOpened: (){
-                      _homePageProvider.panelCheck=true;
-                     },
-                    onPanelClosed: (){
-                      _homePageProvider.panelCheck=false;
-
-                    },
-                    controller:_homePageProvider.panelController ,
-                 minHeight: 33.0.h,
-                 maxHeight: 85.0.h,
-                    collapsed: Container(
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding:   EdgeInsets.only(top:2.0.h),
-                          child: Text('Ayrıntılar için yukarı kaydırınız',style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w500),),
-                        ),
                       ),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.vertical(top:Radius.circular(30))
+
+                    ],
+                  )),
+            ),
+
+            Opacity(
+              opacity: _homePageProvider.checkMenuVisibility()==false?1:0.8,
+              child: Visibility(
+                visible: expansionState==true?false:true,
+                 child:_homePageProvider.park[_homePageProvider.parkListPosition].photo!=null?
+                  SlidingUpPanel(
+                   borderRadius: BorderRadius.circular(30),
+                  onPanelOpened: (){
+                    _homePageProvider.panelCheck=true;
+                   },
+                  onPanelClosed: (){
+                    _homePageProvider.panelCheck=false;
+
+                  },
+                  controller:_homePageProvider.panelController ,
+               minHeight: 32.0.h,
+               maxHeight: 85.0.h,
+                  collapsed: Container(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding:   EdgeInsets.only(top:3.5.h),
+                        child: Text('Ayrıntılar için yukarı kaydırınız',style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w500),),
                       ),
                     ),
-                    panelBuilder: (scrollCntrl){
-                      print(scrollCntrl.initialScrollOffset);
-                      return         _homePageProvider.park[_homePageProvider.parkListPosition].photo!=null?
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(top:Radius.circular(30))
+                    ),
+                  ),
+                  panelBuilder: (scrollCntrl){
+                    print(scrollCntrl.initialScrollOffset);
+                    return         _homePageProvider.park[_homePageProvider.parkListPosition].photo!=null?
 
-                      SingleChildScrollView(
-                          controller: scrollCntrl,
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(
-                              sigmaX: 5,
-                              sigmaY: 5
-                            ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(30),
-                                    topRight: Radius.circular(30),
-                                    bottomLeft: Radius.circular(30),
-                                    bottomRight: Radius.circular(30),
-                                  )
-                              ),
-                              height:1170,
-                              child:
-                              Column(
-                                children: [
-                                  InkWell(
-                                    onTap: (){
-
-                                      if( _homePageProvider.detailvisiblity==true){
-                                        _homePageProvider.detailvisiblity=false;
-                                        _homePageProvider.opacity=0.6;
-                                      }
-                                      else{
-                                        _homePageProvider.opacity=1;
-                                        _homePageProvider.detailvisiblity=true;
-                                      }
-                                    },
-                                    child: Column(children: [
-
-                                      Visibility(
-                                        visible: true,
-                                        child: Column(children: [
-                                          detailInfo( _homePageProvider.parkListPosition),
-                                          Padding(
-                                            padding:  EdgeInsets.all(8.0),
-                                            child: Divider(color: Colors.black45,indent: 30,endIndent: 30,),
-                                          ),
-                                          SingleChildScrollView(
-                                            child: Column(children: [
-                                              detailCard(title: AppLocalizations.getString('accessible'),icon: Icons.accessible,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].engellidostu),
-                                              SizedBox(height: 30,),
-                                              detailCard(title:  AppLocalizations.getString('sport_field'),icon: Icons.fitness_center,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].kosuPark),
-                                              SizedBox(height: 30,),
-                                              detailCard(title:  AppLocalizations.getString('eat'),icon: Icons.free_breakfast,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].yemeicme),
-                                              SizedBox(height: 30,),
-                                              detailCard(title:  AppLocalizations.getString('wc'),icon: Icons.wc,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].tuvalet),
-                                              SizedBox(height: 30,),
-                                              detailCard(title:  AppLocalizations.getString('culture'),icon: Icons.museum,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].kultureloge),
-                                              SizedBox(height: 30,),
-                                              detailCard(title:  AppLocalizations.getString('car_park'),icon: Icons.directions_car,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].otopark),
-                                              SizedBox(height: 30,),
-                                              detailCard(title:  AppLocalizations.getString('sit_field'),icon: Icons.airline_seat_recline_normal,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].oturmaalani),
-                                            ],),
-                                          ),
-
-                                        ],),
-                                      ),
-
-
-
-                                    ],),
-
-                                  ),
-
-                                ],
-                              ) ,
-
-
-                            ),
+                    SingleChildScrollView(
+                        controller: scrollCntrl,
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(
+                            sigmaX: 5,
+                            sigmaY: 5
                           ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(30),
+                                  topRight: Radius.circular(30),
+                                  bottomLeft: Radius.circular(30),
+                                  bottomRight: Radius.circular(30),
+                                )
+                            ),
+                            height:1770,
+                            child:
+                            Column(
+                              children: [
+                                InkWell(
+                                  onTap: (){
+
+                                    if( _homePageProvider.detailvisiblity==true){
+                                      _homePageProvider.detailvisiblity=false;
+                                      _homePageProvider.opacity=0.6;
+                                    }
+                                    else{
+                                      _homePageProvider.opacity=1;
+                                      _homePageProvider.detailvisiblity=true;
+                                    }
+                                  },
+                                  child: Column(children: [
+
+                                    Visibility(
+                                      visible: true,
+                                      child: Column(children: [
+                                        detailInfo( _homePageProvider.parkListPosition),
+                                        Padding(
+                                          padding:  EdgeInsets.all(8.0),
+                                          child: Divider(color: Colors.black45,indent: 30,endIndent: 30,),
+                                        ),
+                                        SingleChildScrollView(
+                                          child: Column(children: [
+                                            detailCard(title: AppLocalizations.getString('accessible'),icon: Icons.accessible,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].engellidostu,content: AppLocalizations.getString('accessible_content')),
+                                            SizedBox(height: 30,),
+                                            detailCard(title:  AppLocalizations.getString('sport_field'),icon: Icons.fitness_center,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].sporalani,content:AppLocalizations.getString('Spor_Alani_content') ),
+                                            SizedBox(height: 30,),
+                                            detailCard(title:  AppLocalizations.getString('eat'),icon: Icons.free_breakfast,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].yemeicme,content:AppLocalizations.getString('eat_content') ),
+                                            SizedBox(height: 30,),
+                                            detailCard(title:  AppLocalizations.getString('wc'),icon: Icons.wc,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].tuvalet,content: AppLocalizations.getString('wc_content')),
+                                            SizedBox(height: 30,),
+                                            detailCard(title:  AppLocalizations.getString('culture'),icon: Icons.museum,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].kultureloge,content: AppLocalizations.getString('culture_content') ),
+                                            SizedBox(height: 30,),
+                                            detailCard(title:  AppLocalizations.getString('car_park'),icon: Icons.directions_car,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].otopark),
+                                            SizedBox(height: 30,),
+                                            detailCard(title:  AppLocalizations.getString('sit_field'),icon: Icons.airline_seat_recline_normal,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].oturmaalani,content: AppLocalizations.getString('sit_fields_content') ),
+                                            SizedBox(height: 30,),
+                                            detailCard(title:  AppLocalizations.getString('basketball'),icon: Icons.sports_basketball_rounded,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].basketbol,content: AppLocalizations.getString('Basketbol_content') ),
+                                            SizedBox(height: 30,),
+                                            detailCard(title:  AppLocalizations.getString('sports_field'),icon: Icons.sports_mma_sharp,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].sporalani,content: AppLocalizations.getString('Spor_Alani_content') ),
+                                            SizedBox(height: 30,),
+                                            detailCard(title:  AppLocalizations.getString('bicycle_path'),icon: Icons.directions_bike_outlined,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].bisikletyolu,content: AppLocalizations.getString('Bisiklet_Yolu_content') ),
+                                            SizedBox(height: 30,),
+                                            detailCard(title:  AppLocalizations.getString('running_track'),icon: Icons.directions_run,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].kosuparkuru,content: AppLocalizations.getString('Kosu_Parkuru_content') ),
+                                            SizedBox(height: 30,),
+                                            detailCard(title:  AppLocalizations.getString('wifi'),icon: Icons.wifi,enabled: _homePageProvider.park[_homePageProvider.parkListPosition].wifi,content: AppLocalizations.getString('Wifi_content') ),
+                                          ],),
+                                        ),
+
+                                      ],),
+                                    ),
+
+
+
+                                  ],),
+
+                                ),
+
+                              ],
+                            ) ,
+
+
+                          ),
+                        ),
 
 
 
 
-                      ):Container();
+                    ):Container();
 
-                    },
-                  ):Container()
-                ),
+                  },
+                )
+
+                 :Container()
               ),
-              Visibility(
-                visible: _homePageProvider.checkMenuVisibility(),
-                child: Positioned(
-                    bottom: 2.0.h,
-                    child: Container(
-                      height: 39.0.w,
-                      width: MediaQuery.of(context).size.width,
-                      child: PageView.builder(
-                        key: PageStorageKey('index'),
-                        itemCount:_homePageProvider.park.length,
-                        itemBuilder: (context, position) {
+            ),
+             Visibility(
+              visible: _homePageProvider.checkMenuVisibility(),
+              child: Positioned(
+                  bottom: 5.0.h,
+                  child: Container(
+                    height: 39.0.w,
+                    width: MediaQuery.of(context).size.width,
+                    child: PageView.builder(
+                      key: PageStorageKey('index'),
+                      itemCount:_homePageProvider.park.length,
+                      itemBuilder: (context, position) {
 
 
-                          _homePageProvider.parkListPosition = _homePageProvider.pageController.position.minScrollExtent == null ? _homePageProvider.pageController.initialPage.toInt() : _homePageProvider.pageController.page.toInt();
+                        _homePageProvider.parkListPosition = _homePageProvider.pageController.position.minScrollExtent == null ? _homePageProvider.pageController.initialPage.toInt() : _homePageProvider.pageController.page.toInt();
 
-                          return Visibility(
-                              visible: expansionState==true?false:true,
-                              child: parkListCard(position));
-                        },
-                        controller: _homePageProvider.pageController,
-                      ),
-                    )),
-              ),
+                        return Visibility(
+                            visible: expansionState==true?false:true,
+                            child: parkListCard(position));
+                      },
+                      controller: _homePageProvider.pageController,
+                    ),
+                  )),
+            ),
 
-              Positioned(
-                top:34,
-                left: 100,
-                right: 10,
-                child:  InkWell(
-                  onTap: (){
+
+            Positioned(
+              top:34,
+              left: 100,
+              right: 10,
+              child:  InkWell(
+                onTap: (){
+                  setState(() {
+                    _homePageProvider.expansionTileList.currentState.collapse();
+
                     setState(() {
-                      _homePageProvider.expansionTileList.currentState.collapse();
-
-                      setState(() {
-
-                      });
 
                     });
 
-                  },
-                  child: Container()
-                )
+                  });
 
-              ),
+                },
+                child: Container()
+              )
+
+            ),
 
 
 
-              Visibility(
-                visible: expansionState==true?false:true,
-                child: Visibility(
-                    visible: _homePageProvider.checkMenuVisibility(),
-                    child: zoomButtons()),
-              ),
-            ],),
-          ),
-        ],
-      ),
+            Visibility(
+              visible: expansionState==true?false:true,
+              child: Visibility(
+                  visible: _homePageProvider.checkMenuVisibility(),
+                  child: zoomButtons()),
+            ),
+          ],),
+        ),
+      ],
     );
   }
 
@@ -353,6 +521,8 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
       child: InkWell(
         onTap: () async{
          await _homePageProvider.moveCamera();
+         await _homePageProvider.panelController.open();
+
         },
         child:
 
@@ -402,18 +572,24 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                           Row(
                             children: [
                               Icon(Icons.star,color: Colors.orange,size: 18,),
-                              Text(_homePageProvider.ortRating.toString(),style: TextStyle(fontSize: 12,color: Colors.grey),),
+                              Text(_homePageProvider.ortRating!=null?_homePageProvider.ortRating.ceilToDouble().toString():'null',style: TextStyle(fontSize: 12,color: Colors.grey),),
 
                             ],
                           ),
 
-                          Row(
+                          Wrap(
                             children: [
                               Icon(Icons.location_on,size: 17,),
-                              Text(
-                                _homePageProvider.park[_homePageProvider.parkListPosition].description.toUpperCase(),
-                                style: TextStyle(
-                                    fontSize:8.0, fontWeight: FontWeight.w500,color: Colors.grey),
+                              Expanded(
+                                child: Container(
+                                  width: 30.0.w,
+
+                                  child: Text(
+                                    _homePageProvider.park[_homePageProvider.parkListPosition].description.toUpperCase(),
+                                    style: TextStyle(
+                                        fontSize:8.0, fontWeight: FontWeight.w500,color: Colors.grey),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -445,9 +621,9 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                   child:Container(
                     child: Center(
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Gözcü modundan çıkmak için yana kaydırınız',style: TextStyle(color: Colors.grey),),
+                          Expanded(child: Text('Gözcü modundan çıkmak için yana kaydırınız',style: TextStyle(color: Colors.grey),)),
                           Icon(Icons.chevron_right,color: Colors.grey,)
                         ],
                       ),
@@ -461,10 +637,253 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
       ),
     );
   }
-  Widget filterBar(){
+  Widget  filterBar(){
     return   Padding(
       padding:  EdgeInsets.only(left:22.0.w,right: 5.0.w),
-      child: Card(
+      child: expansionState==false?Card(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0)),
+        elevation: 20,
+        child: SizedBox(
+          height:17.0.w,
+          child: Stack(
+            children: [
+              AppExpansionTile(
+                onExpansionChanged: (value){
+                  setState(() {
+                    expansionState=value;
+                  });
+                },
+                key: _homePageProvider.expansionTileList,
+                backgroundColor: Colors.transparent,
+                children: [
+                  Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20.0.sp)
+                      ),
+                      height: 40.0.h,
+                      width: 250.0.w,
+                      child:SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Divider(color: Colors.black38,),
+                            Column(
+                              children: [
+
+
+                                Padding(
+                                  padding: const EdgeInsets.only(top:16.0,left:2),
+                                  child: FilterButton(icon: Icons.airline_seat_recline_normal,index: 0,homePageProvider: _homePageProvider,select: _homePageProvider.oturmaalani,name1: _homePageProvider.filter[0],),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left:5.0,top:16),
+                                  child: FilterButton(icon: Icons.accessible,index: 1,select: _homePageProvider.engellidostu,name1: _homePageProvider.filter[1],homePageProvider: _homePageProvider,),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top:16.0,left:2),
+                                  child: FilterButton(icon: Icons.free_breakfast,index:2,select: _homePageProvider.yemek,name1: _homePageProvider.filter[2],homePageProvider: _homePageProvider,),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left:5.0,top:16),
+                                  child: FilterButton(icon:Icons.wc,select: _homePageProvider.wc,name1: _homePageProvider.filter[3],index: 3,homePageProvider: _homePageProvider,),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top:16.0,left:2),
+                                  child: FilterButton(icon: Icons.museum,select: _homePageProvider.kultureloge,name1: _homePageProvider.filter[4],index: 4,homePageProvider: _homePageProvider,),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left:5.0,top:16),
+                                  child: FilterButton(icon: Icons.directions_car,select: _homePageProvider.otopark,name1: _homePageProvider.filter[5],index: 5,homePageProvider: _homePageProvider,),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top:16.0,left:2),
+                                  child: FilterButton(icon: Icons.sports_basketball_rounded,select: _homePageProvider.basketboll,name1: _homePageProvider.filter[6],index: 6,homePageProvider: _homePageProvider,),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left:5.0,top:16),
+                                  child: FilterButton(icon: Icons.sports_mma_sharp,select: _homePageProvider.sports_fields,name1: _homePageProvider.filter[7],index: 7,homePageProvider: _homePageProvider,),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top:16.0,left:2),
+                                  child: FilterButton(icon: Icons.directions_bike_outlined,select: _homePageProvider.bicycle_path,name1: _homePageProvider.filter[8],index: 8,homePageProvider: _homePageProvider,),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left:5.0,top:16),
+                                  child: FilterButton(icon: Icons.directions_run,select: _homePageProvider.running_track,name1: _homePageProvider.filter[9],index: 9,homePageProvider: _homePageProvider,),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top:16.0,left:2),
+                                  child: FilterButton(icon: Icons.wifi,select: _homePageProvider.wifi,name1: _homePageProvider.filter[9],index: 9,homePageProvider: _homePageProvider,),
+                                ),
+
+                              ],
+                            ),
+
+                          ],
+                        ),
+                      )
+                  )
+                ],
+              ),
+              Padding(
+                padding:  EdgeInsets.only(left: 4.0.w,right: 4.0.w,top:3.0.w,),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                  children: [
+                    Stack(
+                      children: [
+                        Text(AppLocalizations.getString('filter'),style: TextStyle(color:_homePageProvider.oturmaalani==true||_homePageProvider.otopark==true||_homePageProvider.kultureloge==true||_homePageProvider.yemek==true||_homePageProvider.wc==true||_homePageProvider.engellidostu==true||_homePageProvider.spor==true?Colors.white:Colors.grey),),
+                        Padding(
+                          padding: const EdgeInsets.only(left:8.0,top:2),
+                          child: Wrap(
+                            children: [
+                              Visibility(
+                                visible: _homePageProvider.engellidostu,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Icon(Icons.accessible,color:Color(0xff00524E)),
+                                ),
+                              ),
+                              Visibility(
+                                visible: _homePageProvider.spor,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Icon(Icons.fitness_center,color:Color(0xff00524E)),
+                                ),
+                              ),
+                              Visibility(
+                                visible: _homePageProvider.wc,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Icon(Icons.wc,color:Color(0xff00524E)),
+                                ),
+                              ),
+                              Visibility(
+                                visible: _homePageProvider.yemek,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Icon(Icons.free_breakfast,color:Color(0xff00524E)),
+                                ),
+                              ),
+                              Visibility(
+                                visible: _homePageProvider.kultureloge,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Icon(Icons.museum,color:Color(0xff00524E)),
+                                ),
+                              ),
+                              Visibility(
+                                visible: _homePageProvider.otopark,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Icon(Icons.directions_car,color:Color(0xff00524E)),
+                                ),
+                              ),
+                              Visibility(
+                                visible: _homePageProvider.oturmaalani,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Icon(Icons.airline_seat_recline_normal,color:Color(0xff00524E),),
+                                ),
+                              ),
+                              Visibility(
+                                visible: _homePageProvider.basketboll,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Icon(Icons.sports_basketball_rounded,color:Color(0xff00524E),),
+                                ),
+                              ),
+                              Visibility(
+                                visible: _homePageProvider.sports_fields,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Icon(Icons.sports_mma_sharp,color:Color(0xff00524E),),
+                                ),
+                              ),
+                              Visibility(
+                                visible: _homePageProvider.bicycle_path,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Icon(Icons.directions_bike_outlined,color:Color(0xff00524E),),
+                                ),
+                              ),
+                              Visibility(
+                                visible: _homePageProvider.running_track,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Icon(Icons.directions_run_outlined,color:Color(0xff00524E),),
+                                ),
+                              ),
+                              Visibility(
+                                visible: _homePageProvider.wifi,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Icon(Icons.wifi,color:Color(0xff00524E),),
+                                ),
+                              ),
+                            ],),
+                        ),
+
+                      ],
+                    ),
+                    Row(children: [
+                      Container(height: 5.0.h,width: 1,color: Colors.grey.shade400,),
+                      SizedBox(width: 2.0.w,),
+                      Icon(Icons.filter_list,color: Color(0xff545857),),
+                    ],)
+                ],
+                ),
+              ),
+              Visibility(
+                visible: expansionState==true?true:false,
+                child: Padding(
+                  padding:  EdgeInsets.only(top:47.0.h),
+                  child: InkWell(
+                    onTap: (){
+                      _homePageProvider.expansionTileList.currentState.collapse();
+                      _homePageProvider.checkFilter2();
+
+                    },
+                    child: Container(
+                      child: Center(child: Text("UYGULA",style: TextStyle(color: Colors.green.shade700,fontWeight: FontWeight.w700,fontSize: 18.0.sp),)),
+                      width: 80.0.w,
+                      height: 7.0.h,
+                      decoration: BoxDecoration(
+                          color: Colors.transparent,
+
+                          borderRadius: BorderRadius.only()
+                      ),
+                    ),
+                  ),
+                ),
+              )
+
+            ],
+          ),
+        ),
+      ):Card(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0)),
         elevation: 20,
@@ -492,6 +911,8 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                           Divider(color: Colors.black38,),
                           Column(
                             children: [
+
+
                               Padding(
                                 padding: const EdgeInsets.only(top:16.0,left:2),
                                 child: FilterButton(icon: Icons.airline_seat_recline_normal,index: 0,homePageProvider: _homePageProvider,select: _homePageProvider.oturmaalani,name1: _homePageProvider.filter[0],),
@@ -526,7 +947,39 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                               ),
                             ],
                           ),
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top:16.0,left:2),
+                                child: FilterButton(icon: Icons.sports_basketball_rounded,select: _homePageProvider.basketboll,name1: _homePageProvider.filter[6],index: 6,homePageProvider: _homePageProvider,),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left:5.0,top:16),
+                                child: FilterButton(icon: Icons.sports_mma_sharp,select: _homePageProvider.sports_fields,name1: _homePageProvider.filter[7],index: 7,homePageProvider: _homePageProvider,),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top:16.0,left:2),
+                                child: FilterButton(icon: Icons.directions_bike_outlined,select: _homePageProvider.bicycle_path,name1: _homePageProvider.filter[8],index: 8,homePageProvider: _homePageProvider,),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left:5.0,top:16),
+                                child: FilterButton(icon: Icons.directions_run,select: _homePageProvider.running_track,name1: _homePageProvider.filter[9],index: 9,homePageProvider: _homePageProvider,),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top:16.0,left:2),
+                                child: FilterButton(icon: Icons.wifi,select: _homePageProvider.wifi,name1: _homePageProvider.filter[10],index: 10,homePageProvider: _homePageProvider,),
+                              ),
 
+                            ],
+                          ),
                         ],
                       ),
                     )
@@ -534,17 +987,23 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
               ],
             ),
             Padding(
-              padding:  EdgeInsets.only(left: 4.0.w,right: 4.0.w,top:1.4.w,),
+              padding:  EdgeInsets.only(left: 4.0.w,right: 4.0.w,top:3.0.w,),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                 children: [
                   Stack(
                     children: [
-                      Text(AppLocalizations.getString('filter'),style: TextStyle(color:_homePageProvider.oturmaalani==true||_homePageProvider.otopark==true||_homePageProvider.kultureloge==true||_homePageProvider.yemek==true||_homePageProvider.wc==true||_homePageProvider.engellidostu==true||_homePageProvider.spor==true?Colors.white:Colors.grey),),
+                      Text(AppLocalizations.getString('filter'),
+                        style: TextStyle(color:_homePageProvider.oturmaalani==true||
+                            _homePageProvider.otopark==true||
+                            _homePageProvider.kultureloge==true||
+                            _homePageProvider.yemek==true||_homePageProvider.wc==true||
+                            _homePageProvider.engellidostu==true||
+                            _homePageProvider.spor==true||_homePageProvider.basketboll ||_homePageProvider.sports_fields||_homePageProvider.bicycle_path||_homePageProvider.running_track||_homePageProvider.wifi?Colors.white:Colors.grey),),
                       Padding(
                         padding: const EdgeInsets.only(left:8.0,top:2),
-                        child: Row(
+                        child: Wrap(
                           children: [
                             Visibility(
                               visible: _homePageProvider.engellidostu,
@@ -595,6 +1054,41 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                                 child: Icon(Icons.airline_seat_recline_normal,color:Color(0xff00524E),),
                               ),
                             ),
+                            Visibility(
+                              visible: _homePageProvider.basketboll,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(Icons.sports_basketball_rounded,color:Color(0xff00524E),),
+                              ),
+                            ),
+                            Visibility(
+                              visible: _homePageProvider.sports_fields,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(Icons.sports_mma_sharp,color:Color(0xff00524E),),
+                              ),
+                            ),
+                            Visibility(
+                              visible: _homePageProvider.bicycle_path,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(Icons.directions_bike_outlined,color:Color(0xff00524E),),
+                              ),
+                            ),
+                            Visibility(
+                              visible: _homePageProvider.running_track,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(Icons.directions_run_outlined,color:Color(0xff00524E),),
+                              ),
+                            ),
+                            Visibility(
+                              visible: _homePageProvider.wifi,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(Icons.wifi,color:Color(0xff00524E),),
+                              ),
+                            ),
                           ],),
                       ),
                     ],
@@ -604,7 +1098,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                     SizedBox(width: 2.0.w,),
                     Icon(Icons.filter_list,color: Color(0xff545857),),
                   ],)
-              ],
+                ],
               ),
             ),
             Visibility(
@@ -633,11 +1127,8 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
 
           ],
         ),
-      ),
+      )
     );
-
-
-
 
       Padding(
       padding: const EdgeInsets.only(left:10.0,right: 0),
@@ -736,12 +1227,6 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
         ),
       ),
     );
-
-
-
-
-
-
       Stack(
       children: [
         Padding(
@@ -983,17 +1468,67 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                       GFRating(
                         value: _homePageProvider.userRating,
                         onChanged: (value)async{
-                          setState(() {
+                          if(userState==false){
+                            showDialog(context: context,
+                                child: AlertDialog(
+                                  backgroundColor: Colors.transparent,
+                                  content: Container(
+                                    color: Colors.white,
+                                    height: 270,
+                                    width: 200,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(bottom:150.0,left: 10,right: 10),
+                                          child: Text("Lütfen önce giriş yapınız.",style: TextStyle(fontWeight: FontWeight.w700),),
+                                        ),
+                                        InkWell(
+                                          onTap: ()async{
+                                            signIn();
+
+                                          },
+                                          child: Container(
+                                            child:Center(child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Container(
+                                                    height: 30,
+                                                    width: 30,
+                                                    child: Image.asset("asset/google_icon.png")),
+
+                                                Text("GİRİŞ YAP",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700,fontSize: 20),),
+                                              ],
+                                            )),
+                                            width: MediaQuery.of(context).size.width,
+                                            height: 60,
+                                            color: Colors.green.shade700,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                )
+                            );
+                          }else{
+
+                            setState(() {
+                              _homePageProvider.userRating=value;
+
+                            });
                             _homePageProvider.userRating=value;
 
-                          });
-                            _homePageProvider.userRating=value;
 
-                          await _homePageProvider.setRating(_homePageProvider.park[_homePageProvider.parkListPosition].title, user.uid, value).then((value) =>print("başarılı"));
+                            await _homePageProvider.setRating(_homePageProvider.park[_homePageProvider.parkListPosition].title, user.uid, value).then((value) =>print("başarılı"));
 
-                         await _homePageProvider.getRating(_homePageProvider.park[_homePageProvider.parkListPosition].title);
-                         await _homePageProvider.getUserRating(_homePageProvider.park[_homePageProvider.parkListPosition].title,user.uid);
-                          ratingValue= _homePageProvider.userRating;
+                            await _homePageProvider.getRating(_homePageProvider.park[_homePageProvider.parkListPosition].title);
+                            await _homePageProvider.getUserRating(_homePageProvider.park[_homePageProvider.parkListPosition].title,user.uid);
+                            ratingValue= _homePageProvider.userRating;
+
+                          }
+
+
+
 
     },
                         borderColor: Colors.orange,
@@ -1002,7 +1537,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                       ),
                       Padding(
                         padding:  EdgeInsets.all(2.0.w),
-                        child: Text("Park Puanı: "+_homePageProvider.ortRating.toString().trim(),style: TextStyle(color: Colors.grey),),
+                        child: Text("Park Puanı: "+_homePageProvider.ortRating.ceilToDouble().toString(),style: TextStyle(color: Colors.grey),),
                       )
                     ],
                   )
@@ -1046,7 +1581,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
     );
   }
 
-  Widget detailCard({String title, IconData icon,bool enabled}){
+  Widget detailCard({String title, IconData icon,bool enabled,String content}){
    return Padding(
      padding:  EdgeInsets.only(left:5.0.w,right: 5.0.w),
      child: Container(
@@ -1066,14 +1601,38 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
             Expanded(child: Text(title,style: TextStyle(fontSize: 15.0.sp,fontWeight: FontWeight.w500,color: enabled==false?Colors.grey: Color(0xff00524E)),)),
             Padding(
               padding:  EdgeInsets.only(bottom:5.0.h,left: 10.0.w,right: 5.0.w),
-              child: Container(
-                child: Icon(Icons.info_outline,color: Colors.white,),
-                decoration: BoxDecoration(
-                  color: Colors.amber,
-                  borderRadius: BorderRadius.circular(40),
+              child: InkWell(
+                onTap: ()async{
+               await   showDialog(context: context,
+                      child: AlertDialog(
+                        backgroundColor: Colors.transparent,
+                        content: Container(
+                          color: Colors.white,
+                          height: 300,
+                          width: 200,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(bottom:150.0,left: 10,right: 10),
+                                child: Text(content!=null?content:title,style: TextStyle(fontWeight: FontWeight.w700),),
+                              ),
+
+                            ],
+                          ),
+                        ),
+                      )
+                  );
+                },
+                child: Container(
+                  child: Icon(Icons.info_outline,color: Colors.white,),
+                  decoration: BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  height: 24,
+                  width: 24,
                 ),
-                height: 24,
-                width: 24,
               ),
             )
 
@@ -1085,10 +1644,30 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
 
   @override
   void afterFirstLayout(BuildContext context) async{
+
+
     // TODO: implement afterFirstLayout
 
+
+
+
+
+    _auth.authStateChanges().listen((event)async {
+      if(event!=null){
+        user= event;
+
+        userState=true;
+        await  _homePageProvider.getUserRating(_homePageProvider.park[_homePageProvider.parkListPosition].title,user.uid);
+      }else{
+        userState=false;
+
+        print('kullanıcı yok');
+
+      }
+
+    });
+
     await _homePageProvider.getRating(_homePageProvider.park[_homePageProvider.parkListPosition].title);
-    await  _homePageProvider.getUserRating(_homePageProvider.park[_homePageProvider.parkListPosition].title,user.uid);
 
 
   }
@@ -1136,7 +1715,22 @@ class _FilterButtonState extends State<FilterButton> {
           case 5:
             widget.homePageProvider.otopark==false?widget.homePageProvider.otopark=true:widget.homePageProvider.otopark=false;
             break;
+          case 6:
+            widget.homePageProvider.basketboll==false?widget.homePageProvider.basketboll=true:widget.homePageProvider.basketboll=false;
+            break;
+          case 7:
+            widget.homePageProvider.sports_fields==false?widget.homePageProvider.sports_fields=true:widget.homePageProvider.sports_fields=false;
+            break;
+          case 8:
+            widget.homePageProvider.bicycle_path==false?widget.homePageProvider.bicycle_path=true:widget.homePageProvider.bicycle_path=false;
+            break;
+          case 9:
+            widget.homePageProvider.running_track==false?widget.homePageProvider.running_track=true:widget.homePageProvider.running_track=false;
+            break;
 
+          case 10:
+            widget.homePageProvider.wifi==false?widget.homePageProvider.wifi=true:widget.homePageProvider.wifi=false;
+            break;
         }
 
 

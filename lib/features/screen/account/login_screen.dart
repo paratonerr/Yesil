@@ -39,6 +39,16 @@ class _LoginScreenState extends State<LoginScreen> {
     // TODO: implement initState
 
     super.initState();
+
+    _auth.authStateChanges().listen((event) {
+      if(event!=null){
+        Navigator.pushNamed(context, AppRoutes.home);
+      }else{
+        print('kullanıcı yok');
+
+      }
+
+    });
   }
   @override
   Widget build(BuildContext context) {

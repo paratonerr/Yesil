@@ -18,5 +18,29 @@
   "basarimlar": "Achiecements",
   "green_areas_discovered": "Parks discovered",
   "completed_tasks": "Quests completed",
-  "level": "level"
+  "level": "level",
+
+
+
+  "basketball": "Basketbol",
+  "sports_field": "Spor Alanı",
+  "bicycle_path": "Bisiklet Yolu",
+  "running_track": "Koşu Parkuru",
+  "wifi": "Wi-Fi",
+
+
+
+  "Basketbol_content": "Çevrende yürüme mesafesinde bir basketbol sahası bulmak mümkün. Sahaların yüzeyleri genellikle beton veya asfalt gibi standart kaplama malzemelerinden yapılır.",
+  "Spor_Alani_content": "Yeşil alanlarda bulunan vücut geliştirme barları, spor aletleri ile egzersizinizi bir yeşil alanda yapmanın keyfinin yanı sıra kendinizi daha dinç ve dinamik hale getirebilirsiniz.",
+  "Bisiklet_Yolu_content": "Sürdürülebilir bir çevre için alternatif ulaşım araçlarını rahatlıkla kullanabilirsiniz.",
+  "Kosu_Parkuru_content": "Yeşil Alanlarda bulunan koşu parkurları sayesinde önünüze herhangi bir engel çıkmadan, koşuya uygun tasarlanmış zeminlerde hem antrenman hem de sağlık amaçlı koşular gerçekleştirebilirsiniz.",
+  "Yürüyüs_Yolu_content": "Yürüyüş yapmak, beden ve zihin sağlığı açısından çok önemlidir. Yeşil alanlarda bulunan yürüyüş yollarında yeşilin tadını çıkarabilirsiniz.",
+  "Wifi_content": "En rahat ettiğiniz ortamlarda bile dünyadan kopmadan internete ücretsiz bağlanabilirsiniz.",
+
+
+  "wc_content": "Yeşil alanlarda bulunan her bireye uygun el yıkama, tuvalet, bebek ihtiyaçlarını karşılayabilirsiniz.",
+  "accessible_content": "Engelli bireyler de engelsiz bir dünyada özgürce dolaşıp, yeşil alanlara rahatlıkla giriş çıkış yapıp, etkinliklerin tadını çıkarabilirler.",
+  "culture_content": "Yeşil Alanlarda bulunan tarihi ve sanat değeri taşıyan yapıları ve eserleri ziyaret edebilirsiniz.",
+  "eat_content": "Yeşil Alanlarda geçirdiğiniz keyifli vakit sonrası çevresinde bir yorgunluk kahvesi içip, bir şeyler yiyebilirsiniz.",
+  "sit_fields_content": "Ferah bir ortamda oturma alanları ile dinlenebilir, ve sevdiklerinizle sohbet edebilirsiniz."
 }

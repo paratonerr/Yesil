@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "693559882176",
-    "project_id": "yesil-4f2e8",
-    "storage_bucket": "yesil-4f2e8.appspot.com"
+    "project_number": "610038275803",
+    "project_id": "yesil-ea967",
+    "storage_bucket": "yesil-ea967.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:693559882176:android:48690c80e9b0586de21825",
+        "mobilesdk_app_id": "1:610038275803:android:5aed8d94fda4ccce5136fe",
         "android_client_info": {
-          "package_name": "com.example.solution_challenge"
+          "package_name": "com.yesil.ist"
         }
       },
       "oauth_client": [
         {
-          "client_id": "693559882176-3t81pdqmue4d3u4dt5lkkkal03jvb3g7.apps.googleusercontent.com",
+          "client_id": "610038275803-dp2sbhmashbv07i434ra7pf40pr2gnp6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.solution_challenge",
+            "package_name": "com.yesil.ist",
             "certificate_hash": "3476836ada57cf4a2fe0d67c090bdfd0bc957294"
           }
         },
         {
-          "client_id": "693559882176-uu8ndisu91h4iv7mg9a1p5ksn7sqv687.apps.googleusercontent.com",
+          "client_id": "610038275803-6u3vi32hd4o77ft3el0vasfd9jindlg7.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB1gQZe_zqUg4D9Fmb35oBGBp4O__Y4IL4"
+          "current_key": "AIzaSyApJsRZP3c1dGUrHLG_gFG0nmLh_njs_XU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "693559882176-uu8ndisu91h4iv7mg9a1p5ksn7sqv687.apps.googleusercontent.com",
+              "client_id": "610038275803-6u3vi32hd4o77ft3el0vasfd9jindlg7.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

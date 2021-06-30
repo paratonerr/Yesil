@@ -217,7 +217,8 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                 initialCameraPosition: CameraPosition(target: LatLng( 41.060701, 29.037435 ),zoom: 12),
               ),
             ),
-            Padding(
+
+             Padding(
               padding:  EdgeInsets.only(top:6.5.h,left: 2.0.w),
               child: Visibility(
                   visible: _homePageProvider.checkMenuVisibility(),
@@ -233,6 +234,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                             }
                           },
                           child: filterBar()),
+
 
                       InkWell(
                         onTap: (){
@@ -311,7 +313,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
               opacity: _homePageProvider.checkMenuVisibility()==false?1:0.8,
               child: Visibility(
                 visible: expansionState==true?false:true,
-                 child:_homePageProvider.park[_homePageProvider.parkListPosition].photo!=null?
+                 child:_homePageProvider.park[_homePageProvider.parkListPosition].title!=null?
                   SlidingUpPanel(
                    borderRadius: BorderRadius.circular(30),
                   onPanelOpened: (){
@@ -339,7 +341,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                   ),
                   panelBuilder: (scrollCntrl){
                     print(scrollCntrl.initialScrollOffset);
-                    return         _homePageProvider.park[_homePageProvider.parkListPosition].photo!=null?
+                    return         _homePageProvider.park[_homePageProvider.parkListPosition].title!=null?
 
                     SingleChildScrollView(
                         controller: scrollCntrl,
@@ -439,6 +441,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                  :Container()
               ),
             ),
+
              Visibility(
               visible: _homePageProvider.checkMenuVisibility(),
               child: Positioned(
@@ -462,6 +465,8 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                     ),
                   )),
             ),
+
+
 
 
             Positioned(
@@ -526,9 +531,10 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
         },
         child:
 
-        _homePageProvider.park[_homePageProvider.parkListPosition].photo!=null?
+        _homePageProvider.park[_homePageProvider.parkListPosition].title!=null?
         Stack(
           children: [
+
             Center(
               child: Container(
                 margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
@@ -543,7 +549,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                       borderRadius: BorderRadius.circular(20.0)),
                   child: Row(
                     children: [
-                      Icon(Icons.chevron_left,color: Colors.grey,),
+                 Icon(Icons.chevron_left,color: Colors.grey,),
                       Padding(
                         padding:  EdgeInsets.all(3.0.w),
                         child: Container(
@@ -553,7 +559,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                               borderRadius: BorderRadius.circular(
                                  20),
                               image: DecorationImage(
-                                  image: NetworkImage(  _homePageProvider.park[_homePageProvider.parkListPosition].photo),
+                                  image: NetworkImage(  _homePageProvider.park[_homePageProvider.parkListPosition].photo!=null?_homePageProvider.park[_homePageProvider.parkListPosition].photo:"https://firebasestorage.googleapis.com/v0/b/yesil-ea967.appspot.com/o/yildiz-parki-1.jpg?alt=media&token=09388921-6388-428c-8c73-fffa6e603749"),
                                   fit: BoxFit.cover)),
                         ),
                       ),
@@ -576,33 +582,34 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
 
                             ],
                           ),
-
                           Wrap(
                             children: [
                               Icon(Icons.location_on,size: 17,),
-                              Expanded(
-                                child: Container(
-                                  width: 30.0.w,
+                              Container(
+                                width: 30.0.w,
 
-                                  child: Text(
-                                    _homePageProvider.park[_homePageProvider.parkListPosition].description.toUpperCase(),
-                                    style: TextStyle(
-                                        fontSize:8.0, fontWeight: FontWeight.w500,color: Colors.grey),
-                                  ),
+                                child: Text(
+                                  _homePageProvider.park[_homePageProvider.parkListPosition].description.toUpperCase(),
+                                  style: TextStyle(
+                                      fontSize:8.0, fontWeight: FontWeight.w500,color: Colors.grey),
                                 ),
                               ),
                             ],
                           ),
 
+
                         ],
                       ),
                       Expanded(child: Icon(Icons.chevron_right,color: Colors.grey,)),
+
 
                     ],
                   ),
                 ),
               ),
             )
+
+
           ],
         ): Stack(
           children: [
@@ -864,6 +871,9 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                     onTap: (){
                       _homePageProvider.expansionTileList.currentState.collapse();
                       _homePageProvider.checkFilter2();
+                      setState(() {
+
+                      });
 
                     },
                     child: Container(
@@ -1109,6 +1119,9 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                   onTap: (){
                     _homePageProvider.expansionTileList.currentState.collapse();
                     _homePageProvider.checkFilter2();
+                    setState(() {
+                      
+                    });
 
                   },
                   child: Container(
@@ -1440,7 +1453,7 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
             child: Container(
               decoration: BoxDecoration(
                   image: DecorationImage(
-                      image:NetworkImage(_homePageProvider.park[_homePageProvider.parkListPosition].photo),
+                      image:NetworkImage(_homePageProvider.park[_homePageProvider.parkListPosition].photo!=null?_homePageProvider.park[_homePageProvider.parkListPosition].photo:"https://firebasestorage.googleapis.com/v0/b/yesil-ea967.appspot.com/o/yildiz-parki-1.jpg?alt=media&token=09388921-6388-428c-8c73-fffa6e603749"),
                       fit: BoxFit.cover
                   ),
                   borderRadius: BorderRadius.only(
@@ -1535,10 +1548,11 @@ class _HomePageWidgetState extends State<HomePageWidget> with AfterLayoutMixin {
                         color: Colors.orange,
                         size: 27,
                       ),
+                      _homePageProvider.ortRating!=null?
                       Padding(
                         padding:  EdgeInsets.all(2.0.w),
                         child: Text("Park Puanı: "+_homePageProvider.ortRating.ceilToDouble().toString(),style: TextStyle(color: Colors.grey),),
-                      )
+                      ):Text("Henüz puanı yok")
                     ],
                   )
                 ),
@@ -1733,6 +1747,9 @@ class _FilterButtonState extends State<FilterButton> {
             break;
         }
 
+        setState(() {
+
+        });
 
       },
       child: Container(

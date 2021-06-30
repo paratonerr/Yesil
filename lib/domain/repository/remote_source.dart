@@ -18,6 +18,7 @@ class Remote{
 
         Map<String,dynamic> t=document.data();
         parkList.add(Parks.fromJsonMap(t));
+        print(Parks.fromJsonMap(t).title);
 
       });
 });

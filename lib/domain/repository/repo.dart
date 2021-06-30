@@ -17,7 +17,11 @@ class ProductRepository implements ProductRepositoryAbs{
   @override
   Future<List<Parks>> getParkList() async{
    try{
-  List<Parks> parkList=await _remote.getParkList();
+     print("product repo: ");
+
+     List<Parks> parkList=await _remote.getParkList();
+
+    print("product repo: "+ parkList.toString());
 
 
   return parkList;

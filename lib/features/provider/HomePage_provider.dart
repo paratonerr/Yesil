@@ -412,26 +412,34 @@ notifyListeners();
   checkFilter2() {
     park.clear();
 
+    park.addAll(parkList.where((element){
+      return (otopark== true?element.otopark==otopark?true:false:true&&wc== true?element.tuvalet == wc?true:false:true&&
+          kultureloge== true?element.kultureloge == kultureloge?true:false:true&&engellidostu==true? element.engellidostu == engellidostu?true:false:true&& oturmaalani==true? element.oturmaalani == oturmaalani?true:false:true
+      && yemek==true?element.yemeicme == yemek?true:false:true&&basketboll==true?element.basketbol == basketboll?true:false:true&&sports_fields==true?element.sporalani == sports_fields?true:false:true&&bicycle_path==true?element.bisikletyolu == bicycle_path?true:false:true&&_running_track==true?element.kosuparkuru == running_track?true:false:true&&wifi==true?element.wifi == wifi?true:false:true);}) );
+/*
     park.addAll(parkList.where((element) {
     return otopark==true? element.otopark == otopark :true&& wc==true? element.tuvalet == wc:true &&
         kultureloge==true?  element.kultureloge == kultureloge :true&&
          engellidostu==true? element.engellidostu == engellidostu :true&&
-         oturmaalani==true? element.oturmaalani == oturmaalani :true&& yemek==true?element.yemeicme == yemek:true&&
-        yemek==true?element.basketbol == basketboll:true&&sports_fields==true?element.sporalani == sports_fields:true&&
-        bicycle_path==true?element.bisikletyolu == bicycle_path:true
-        &&running_track==true?element.kosuparkuru == running_track:true&&wifi==true?element.wifi == wifi:true;
+         oturmaalani==true? element.oturmaalani == oturmaalani:true&& yemek==true?element.yemeicme == yemek :true;
     }));
 
+
     if(park.isNotEmpty){
+      print(park[0].otopark);
       park.addAll(parkList);
 
     }
+ */
 
     if(park.isEmpty){
+      print("çalıştı empty");
+
       park.addAll(parkList);
     }
 
     print(park.length);
+    print("çalıştı");
 
     notifyListeners();
 
